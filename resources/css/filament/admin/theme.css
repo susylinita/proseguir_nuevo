@@ -1,0 +1,59 @@
+/* Look premium tipo home (sin tocar blades de Filament) */
+
+:root {
+  --proseguir-bg: #f8fafc; /* slate-50 */
+}
+
+/* Fondo general del panel */
+.fi-body,
+.fi-main,
+.fi-layout {
+  background: var(--proseguir-bg) !important;
+}
+
+/* Topbar/transparencia tipo premium */
+.fi-topbar {
+  background: rgba(255, 255, 255, 0.80) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgb(226 232 240); /* slate-200 */
+}
+
+/* Sidebar un poco más limpia */
+.fi-sidebar {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-right: 1px solid rgb(226 232 240);
+}
+
+/* Cards / panels */
+.fi-section,
+.fi-card,
+.fi-widgets .fi-card {
+  border-radius: 1.25rem !important; /* similar a tus 2xl/3xl */
+  border: 1px solid rgb(226 232 240) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+}
+
+/* Botones */
+.fi-btn {
+  border-radius: 0.75rem !important;
+  font-weight: 600 !important;
+}
+
+/* Inputs */
+.fi-input,
+.fi-select-input,
+.fi-textarea {
+  border-radius: 0.75rem !important;
+}
+
+/* Tablas */
+.fi-ta-table {
+  border-radius: 1rem !important;
+  overflow: hidden !important;
+  border: 1px solid rgb(226 232 240) !important;
+}
+
+/* Header de página (más “limpio”) */
+.fi-header-heading {
+  letter-spacing: -0.02em;
+}

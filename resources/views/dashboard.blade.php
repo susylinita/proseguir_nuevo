@@ -1,0 +1,22 @@
+<x-app-layout>
+    <x-slot name="header">
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Portal del Estudiante
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <p class="mb-4">Bienvenido/a. Desde aquí puedes gestionar tus postulaciones.</p>
+
+                    <a href="{{ route('student.postulaciones.index') }}"
+                       class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                        Ver mis postulaciones
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>

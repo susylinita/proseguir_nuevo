@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Forzar Filament login a ocupar todo el ancho */
+.fi-simple-layout .fi-simple-main,
+.fi-simple-layout .fi-simple-page,
+.fi-simple-layout .fi-simple-card,
+.fi-simple-layout .fi-page,
+.fi-simple-layout .fi-section {
+    max-width: 100% !important;
+    width: 100% !important;
+}

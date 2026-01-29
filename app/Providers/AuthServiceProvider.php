@@ -22,6 +22,7 @@ class AuthServiceProvider extends ServiceProvider
     KitRegistro::class => KitRegistroPolicy::class, 
     ];
 
+
     /**
      * Register any authentication / authorization services.
      */

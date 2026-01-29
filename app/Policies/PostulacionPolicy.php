@@ -21,8 +21,14 @@ class PostulacionPolicy
 
     public function update(User $user, Postulacion $postulacion): bool
     {
-        return (bool) ($user->is_admin ?? false)
-            || $user->hasRole(['coordinador', 'gerente']);
+        // Admin / Coordinación / Gerencia: siempre pueden editar
+        if ((bool) ($user->is_admin ?? false) || $user->hasRole(['coordinador', 'gerente'])) {
+            return true;
+        }
+
+        // Estudiante (dueño): solo si está en Pendiente
+        return $postulacion->user_id === $user->id
+            && ($postulacion->estado ?? '') === 'Pendiente';
     }
 
     public function delete(User $user, Postulacion $postulacion): bool
@@ -31,3 +37,4 @@ class PostulacionPolicy
             || $user->hasRole(['coordinador', 'gerente']);
     }
 }
+

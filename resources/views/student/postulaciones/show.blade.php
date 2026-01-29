@@ -254,7 +254,7 @@
                                         <img
                                             src="{{ $fileUrl('anexo_foto_documento') }}"
                                             alt="Foto tipo documento"
-                                            class="w-36 sm:w-44 h-auto rounded-md border border-gray-300 shadow-sm object-cover"
+                                            class="w-36 sm:w-60 h-auto rounded-md border border-gray-300 shadow-sm object-cover"
                                         >
                                     </div>
                                 @else
@@ -310,6 +310,7 @@
                                     <div class="text-gray-500">Semestre en curso</div>
                                     <div class="font-medium text-gray-900">{{ $postulacion->semestre_en_curso ?: 'N/D' }}</div>
                                 </div>
+                                
                             @else
                                 <div class="sm:col-span-2 text-sm text-gray-700">
                                     Renovación: solo se validan documentos de notas y matrícula (y cuenta bancaria si cambió).

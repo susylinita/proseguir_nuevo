@@ -251,4 +251,35 @@ class PostulacionController extends Controller
         'Content-Disposition' => 'inline; filename="'.$filename.'"',
     ]);
 }
+
+public function file(Postulacion $postulacion, string $field)
+{
+    $this->authorize('view', $postulacion);
+
+    $allowed = [
+        'anexo_doc_identidad',
+        'anexo_foto_documento',
+        'anexo_certificado_bancario',
+        'pdf_notas',
+        'pdf_matricula',
+        'anexo_certificado_notas',
+        'anexo_recibo_matricula',
+    ];
+
+    abort_unless(in_array($field, $allowed, true), 404);
+
+    $path = $postulacion->{$field} ?? null;
+    abort_unless($path && Storage::disk('public')->exists($path), 404);
+
+    $mime = Storage::disk('public')->mimeType($path) ?? 'application/octet-stream';
+    $filename = basename($path);
+
+    return response()->stream(function () use ($path) {
+        echo Storage::disk('public')->get($path);
+    }, 200, [
+        'Content-Type' => $mime,
+        'Content-Disposition' => 'inline; filename="'.$filename.'"',
+        'X-Content-Type-Options' => 'nosniff',
+    ]);
+}
 }

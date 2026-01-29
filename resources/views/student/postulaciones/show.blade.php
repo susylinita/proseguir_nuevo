@@ -56,11 +56,6 @@
             if (is_null($postulacion->promedio_carrera)) $pendientes[] = 'Promedio de carrera';
         }
 
-        // Compatibilidad con los campos antiguos
-        if (!empty($postulacion->pdf_notas) === false && !empty($postulacion->pdf_matricula) === false) {
-            // no forzamos pendientes aquí
-        }
-
         // Etapas para timeline visual
         $etapas = ['Pendiente', 'Entrevista', 'Aprobado'];
         $rechazada = ($estado === 'Rechazado');
@@ -68,8 +63,10 @@
         $indiceEstado = array_search($estado, $etapas, true);
         $indiceEstado = ($indiceEstado === false) ? -1 : $indiceEstado;
 
-        // Helpers de display
         $generoLabel = $postulacion->genero ?: 'N/D';
+
+        // Helper para links "ver" (inline)
+        $fileUrl = fn(string $field) => route('student.postulaciones.file', [$postulacion, $field]);
     @endphp
 
     <div class="py-12">
@@ -81,7 +78,6 @@
                 </div>
             @endif
 
-            {{-- Resumen superior --}}
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 space-y-4">
 
@@ -117,7 +113,7 @@
                         </div>
                     </div>
 
-                    {{-- Documentos pendientes (CTA) --}}
+                    {{-- Pendientes --}}
                     <div class="rounded-md border border-gray-200 p-4">
                         <div class="text-xs uppercase tracking-wider text-gray-500">Pendientes o incompletos</div>
 
@@ -147,7 +143,7 @@
                         @endif
                     </div>
 
-                    {{-- Timeline visual --}}
+                    {{-- Timeline --}}
                     <div class="rounded-md border border-gray-200 p-4">
                         <div class="text-xs uppercase tracking-wider text-gray-500">Estado visual</div>
 
@@ -192,7 +188,8 @@
                             Las etapas pueden avanzar según revisión de coordinación y aprobación de gerencia.
                         </p>
                     </div>
-                    {{-- Datos del estudiante --}}
+
+                    {{-- Datos del estudiante + foto --}}
                     <div class="rounded-md border border-gray-200 p-4">
                         <div class="text-xs uppercase tracking-wider text-gray-500 mb-4">
                             Datos del estudiante
@@ -200,7 +197,6 @@
 
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
-                            {{-- Info (izquierda) --}}
                             <div class="md:col-span-2">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                                     <div>
@@ -252,19 +248,17 @@
                                 </div>
                             </div>
 
-                            {{-- Foto (derecha) --}}
                             <div class="flex justify-center md:justify-end">
                                 @if (!empty($postulacion->anexo_foto_documento))
                                     <div class="text-center">
                                         <img
-                                            src="{{ asset('storage/' . $postulacion->anexo_foto_documento) }}"
+                                            src="{{ $fileUrl('anexo_foto_documento') }}"
                                             alt="Foto tipo documento"
-                                            class="w-36 sm:w-60 h-auto rounded-md border border-gray-300 shadow-sm"
+                                            class="w-36 sm:w-44 h-auto rounded-md border border-gray-300 shadow-sm object-cover"
                                         >
-                
                                     </div>
                                 @else
-                                    <div class="w-36 sm:w-40 h-44 sm:h-48 flex items-center justify-center rounded-md border border-dashed border-gray-300 text-xs text-gray-400 text-center px-2">
+                                    <div class="w-36 sm:w-44 h-44 flex items-center justify-center rounded-md border border-dashed border-gray-300 text-xs text-gray-400 text-center px-2">
                                         Sin foto tipo documento
                                     </div>
                                 @endif
@@ -272,7 +266,6 @@
 
                         </div>
                     </div>
-
 
                     {{-- Acudiente --}}
                     <div class="rounded-md border border-gray-200 p-4">
@@ -289,7 +282,6 @@
                             </div>
                         </div>
                     </div>
-
 
                     {{-- Estudios --}}
                     <div class="rounded-md border border-gray-200 p-4">
@@ -375,153 +367,59 @@
                         </div>
                     </div>
 
-                    {{-- Documentos / Anexos --}}
+                    {{-- Documentos (INLINE, no descarga) --}}
                     <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Documentos</div>
-
-                        <div class="mt-3 space-y-3 text-sm">
-
-                            @if ($tipo === 'renovacion')
-                                {{-- Renovación --}}
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <div class="font-medium text-gray-900">Certificado de notas</div>
-                                        <div class="text-gray-500">
-                                            {{ $postulacion->anexo_certificado_notas ? basename($postulacion->anexo_certificado_notas) : 'No adjuntado' }}
-                                        </div>
-                                    </div>
-
-                                    @if ($postulacion->anexo_certificado_notas)
-                                        <a class="text-indigo-600 hover:text-indigo-900"
-                                           href="{{ asset('storage/' . $postulacion->anexo_certificado_notas) }}"
-                                           target="_blank" rel="noopener">
-                                            Abrir
-                                        </a>
-                                    @endif
-                                </div>
-
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <div class="font-medium text-gray-900">Recibo de matrícula</div>
-                                        <div class="text-gray-500">
-                                            {{ $postulacion->anexo_recibo_matricula ? basename($postulacion->anexo_recibo_matricula) : 'No adjuntado' }}
-                                        </div>
-                                    </div>
-
-                                    @if ($postulacion->anexo_recibo_matricula)
-                                        <a class="text-indigo-600 hover:text-indigo-900"
-                                           href="{{ asset('storage/' . $postulacion->anexo_recibo_matricula) }}"
-                                           target="_blank" rel="noopener">
-                                            Abrir
-                                        </a>
-                                    @endif
-                                </div>
-                            @else
-                                {{-- Primera vez --}}
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <div class="font-medium text-gray-900">Documento de identidad</div>
-                                        <div class="text-gray-500">
-                                            {{ $postulacion->anexo_doc_identidad ? basename($postulacion->anexo_doc_identidad) : 'No adjuntado' }}
-                                        </div>
-                                    </div>
-
-                                    @if ($postulacion->anexo_doc_identidad)
-                                        <a class="text-indigo-600 hover:text-indigo-900"
-                                           href="{{ asset('storage/' . $postulacion->anexo_doc_identidad) }}"
-                                           target="_blank" rel="noopener">
-                                            Abrir
-                                        </a>
-                                    @endif
-                                </div>
-
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <div class="font-medium text-gray-900">Foto tipo documento</div>
-                                        <div class="text-gray-500">
-                                            {{ $postulacion->anexo_foto_documento ? basename($postulacion->anexo_foto_documento) : 'No adjuntado' }}
-                                        </div>
-                                    </div>
-
-                                    @if ($postulacion->anexo_foto_documento)
-                                        <a class="text-indigo-600 hover:text-indigo-900"
-                                           href="{{ asset('storage/' . $postulacion->anexo_foto_documento) }}"
-                                           target="_blank" rel="noopener">
-                                            Abrir
-                                        </a>
-                                    @endif
-                                </div>
-
-                                <div class="flex items-center justify-between gap-4">
-                                    <div>
-                                        <div class="font-medium text-gray-900">Certificado cuenta bancaria</div>
-                                        <div class="text-gray-500">
-                                            {{ $postulacion->anexo_certificado_bancario ? basename($postulacion->anexo_certificado_bancario) : 'No adjuntado' }}
-                                        </div>
-                                    </div>
-
-                                    @if ($postulacion->anexo_certificado_bancario)
-                                        <a class="text-indigo-600 hover:text-indigo-900"
-                                           href="{{ asset('storage/' . $postulacion->anexo_certificado_bancario) }}"
-                                           target="_blank" rel="noopener">
-                                            Abrir
-                                        </a>
-                                    @endif
-                                </div>
-
-                                <div class="rounded-md bg-gray-50 p-3">
-                                    <div class="text-gray-500 text-xs uppercase tracking-wider">Promedio de carrera</div>
-                                    <div class="font-medium text-gray-900">
-                                        {{ is_null($postulacion->promedio_carrera) ? 'N/D' : $postulacion->promedio_carrera }}
-                                    </div>
-                                </div>
-                            @endif
-
-                            {{-- Compatibilidad con archivos antiguos --}}
-                            @if ($postulacion->pdf_notas || $postulacion->pdf_matricula)
-                                <div class="pt-2 border-t border-gray-200">
-                                    <div class="text-xs uppercase tracking-wider text-gray-500 mb-2"></div>
-
-                                    @if ($postulacion->pdf_notas)
-                                        <div class="flex items-center justify-between gap-4">
-                                            <div>
-                                                <div class="font-medium text-gray-900">PDF Notas</div>
-                                                <div class="text-gray-500">{{ basename($postulacion->pdf_notas) }}</div>
-                                            </div>
-                                            <a class="text-indigo-600 hover:text-indigo-900"
-                                               href="{{ asset('storage/' . $postulacion->pdf_notas) }}"
-                                               target="_blank" rel="noopener">
-                                                Abrir
-                                            </a>
-                                        </div>
-                                    @endif
-
-                                    @if ($postulacion->pdf_matricula)
-                                        <div class="flex items-center justify-between gap-4 mt-2">
-                                            <div>
-                                                <div class="font-medium text-gray-900">PDF Matrícula</div>
-                                                <div class="text-gray-500">{{ basename($postulacion->pdf_matricula) }}</div>
-                                            </div>
-                                            <a class="text-indigo-600 hover:text-indigo-900"
-                                               href="{{ asset('storage/' . $postulacion->pdf_matricula) }}"
-                                               target="_blank" rel="noopener">
-                                                Abrir
-                                            </a>
-                                        </div>
-                                    @endif
-                                </div>
-                            @endif
+                        <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                            Documentos
                         </div>
 
-                        <p class="mt-4 text-xs text-gray-500">
-                            Si los enlaces no abren, asegúrate de haber ejecutado: <code>php artisan storage:link</code>
-                        </p>
+                        <div class="space-y-4 text-sm">
+
+                            @php
+                                $docs = [
+                                    ['label' => 'Documento de identidad', 'field' => 'anexo_doc_identidad'],
+                                    ['label' => 'Certificado bancario', 'field' => 'anexo_certificado_bancario'],
+                                    ['label' => 'Notas académicas', 'field' => 'pdf_notas'],
+                                    ['label' => 'Recibo de matrícula', 'field' => 'pdf_matricula'],
+                                ];
+
+                                if ($tipo === 'renovacion') {
+                                    $docs[] = ['label' => 'Certificado de notas (renovación)', 'field' => 'anexo_certificado_notas'];
+                                    $docs[] = ['label' => 'Recibo matrícula (renovación)', 'field' => 'anexo_recibo_matricula'];
+                                }
+                            @endphp
+
+                            @foreach ($docs as $d)
+                                @php
+                                    $path = $postulacion->{$d['field']} ?? null;
+                                @endphp
+
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div class="font-medium text-gray-900">{{ $d['label'] }}</div>
+                                        <div class="text-gray-500">
+                                            {{ $path ? basename($path) : 'No adjuntado' }}
+                                        </div>
+                                    </div>
+
+                                    @if ($path)
+                                        <a href="{{ $fileUrl($d['field']) }}"
+                                           target="_blank"
+                                           rel="noopener"
+                                           class="text-indigo-600 hover:text-indigo-900">
+                                            Ver
+                                        </a>
+                                    @endif
+                                </div>
+                            @endforeach
+
+                        </div>
                     </div>
 
                 </div>
             </div>
 
-            {{-- Historial real --}}
+            {{-- Historial --}}
             @if (method_exists($postulacion, 'historicoEstados') && $postulacion->relationLoaded('historicoEstados'))
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">

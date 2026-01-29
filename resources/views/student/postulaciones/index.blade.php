@@ -16,8 +16,9 @@
                     Nueva postulación
                 </a>
 
-                <a href="{{ url('/') }}" class="text-sm text-gray-600 hover:text-gray-900">
-                    Volver al inicio
+                <a href="{{ route('student.dashboard') }}" 
+                class="text-sm text-gray-600 hover:text-gray-900">
+                    Volver al dashboard
                 </a>
             </div>
         </div>

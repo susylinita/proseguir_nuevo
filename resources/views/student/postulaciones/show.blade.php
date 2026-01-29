@@ -11,18 +11,24 @@
             </div>
 
             <div class="flex items-center gap-3">
+                <a href="{{ route('student.dashboard') }}"
+                class="text-sm text-gray-600 hover:text-gray-900">
+                    Volver al dashboard
+                </a>
+
                 <a href="{{ route('student.postulaciones.index') }}"
-                   class="text-sm text-gray-600 hover:text-gray-900">
+                class="text-sm text-gray-600 hover:text-gray-900">
                     Volver a mis postulaciones
                 </a>
 
                 @if (($postulacion->estado ?? '') === 'Pendiente')
                     <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
-                       class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                    class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
                         Editar
                     </a>
                 @endif
             </div>
+
         </div>
     </x-slot>
 

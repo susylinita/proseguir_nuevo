@@ -17,10 +17,10 @@ use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\IconEntry;
+use Filament\Infolists\Components\Actions\Action as InfolistAction;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Filament\Tables\Actions\Action;
-
-
+use App\Models\Setting;
 use Illuminate\Support\Facades\Storage;
 
 class PostulacionResource extends Resource
@@ -300,7 +300,8 @@ class PostulacionResource extends Resource
     /**
      * ✅ VIEW BONITO (Infolist) — esto es lo que hace el “show” premium en Filament
      */
-    public static function infolist(Infolist $infolist): Infolist
+
+public static function infolist(Infolist $infolist): Infolist
 {
     $getPendientes = function ($record): array {
         $tipo = $record->tipo_postulacion ?? 'primer_semestre';
@@ -510,7 +511,7 @@ class PostulacionResource extends Resource
                     ->columnSpanFull(),
             ]),
 
-        // ✅ Documentos con "Ver" que abre en nueva pestaña (Filament v3.2: hintAction)
+        // ✅ Documentos con "Ver" que abre en nueva pestaña
         InfoSection::make('Documentos')
             ->schema([
                 Grid::make(2)->schema([
@@ -519,56 +520,56 @@ class PostulacionResource extends Resource
                         ->label('Documento de identidad')
                         ->formatStateUsing(fn ($state) => $state ? basename($state) : 'No adjuntado')
                         ->hintAction(
-                            Action::make('ver_doc_identidad')
+                            InfolistAction::make('ver_doc_identidad')
                                 ->label('Ver')
-                                ->url(fn ($record) => !empty($record->anexo_doc_identidad)
+                                ->url(fn ($record) => filled($record->anexo_doc_identidad)
                                     ? Storage::disk('public')->url($record->anexo_doc_identidad)
                                     : null
                                 )
                                 ->openUrlInNewTab()
-                                ->visible(fn ($record) => !empty($record->anexo_doc_identidad))
+                                ->visible(fn ($record) => filled($record->anexo_doc_identidad))
                         ),
 
                     TextEntry::make('anexo_certificado_bancario')
                         ->label('Certificado bancario')
                         ->formatStateUsing(fn ($state) => $state ? basename($state) : 'No adjuntado')
                         ->hintAction(
-                            Action::make('ver_cert_bancario')
+                            InfolistAction::make('ver_cert_bancario')
                                 ->label('Ver')
-                                ->url(fn ($record) => !empty($record->anexo_certificado_bancario)
+                                ->url(fn ($record) => filled($record->anexo_certificado_bancario)
                                     ? Storage::disk('public')->url($record->anexo_certificado_bancario)
                                     : null
                                 )
                                 ->openUrlInNewTab()
-                                ->visible(fn ($record) => !empty($record->anexo_certificado_bancario))
+                                ->visible(fn ($record) => filled($record->anexo_certificado_bancario))
                         ),
 
                     TextEntry::make('pdf_notas')
                         ->label('Notas académicas (PDF)')
                         ->formatStateUsing(fn ($state) => $state ? basename($state) : 'No adjuntado')
                         ->hintAction(
-                            Action::make('ver_pdf_notas')
+                            InfolistAction::make('ver_pdf_notas')
                                 ->label('Ver')
-                                ->url(fn ($record) => !empty($record->pdf_notas)
+                                ->url(fn ($record) => filled($record->pdf_notas)
                                     ? Storage::disk('public')->url($record->pdf_notas)
                                     : null
                                 )
                                 ->openUrlInNewTab()
-                                ->visible(fn ($record) => !empty($record->pdf_notas))
+                                ->visible(fn ($record) => filled($record->pdf_notas))
                         ),
 
                     TextEntry::make('pdf_matricula')
                         ->label('Recibo de matrícula (PDF)')
                         ->formatStateUsing(fn ($state) => $state ? basename($state) : 'No adjuntado')
                         ->hintAction(
-                            Action::make('ver_pdf_matricula')
+                            InfolistAction::make('ver_pdf_matricula')
                                 ->label('Ver')
-                                ->url(fn ($record) => !empty($record->pdf_matricula)
+                                ->url(fn ($record) => filled($record->pdf_matricula)
                                     ? Storage::disk('public')->url($record->pdf_matricula)
                                     : null
                                 )
                                 ->openUrlInNewTab()
-                                ->visible(fn ($record) => !empty($record->pdf_matricula))
+                                ->visible(fn ($record) => filled($record->pdf_matricula))
                         ),
 
                     TextEntry::make('anexo_certificado_notas')
@@ -576,14 +577,14 @@ class PostulacionResource extends Resource
                         ->formatStateUsing(fn ($state) => $state ? basename($state) : 'No adjuntado')
                         ->visible(fn ($record) => ($record->tipo_postulacion ?? '') === 'renovacion')
                         ->hintAction(
-                            Action::make('ver_notas_renovacion')
+                            InfolistAction::make('ver_notas_renovacion')
                                 ->label('Ver')
-                                ->url(fn ($record) => !empty($record->anexo_certificado_notas)
+                                ->url(fn ($record) => filled($record->anexo_certificado_notas)
                                     ? Storage::disk('public')->url($record->anexo_certificado_notas)
                                     : null
                                 )
                                 ->openUrlInNewTab()
-                                ->visible(fn ($record) => !empty($record->anexo_certificado_notas))
+                                ->visible(fn ($record) => filled($record->anexo_certificado_notas))
                         ),
 
                     TextEntry::make('anexo_recibo_matricula')
@@ -591,19 +592,20 @@ class PostulacionResource extends Resource
                         ->formatStateUsing(fn ($state) => $state ? basename($state) : 'No adjuntado')
                         ->visible(fn ($record) => ($record->tipo_postulacion ?? '') === 'renovacion')
                         ->hintAction(
-                            Action::make('ver_matricula_renovacion')
+                            InfolistAction::make('ver_matricula_renovacion')
                                 ->label('Ver')
-                                ->url(fn ($record) => !empty($record->anexo_recibo_matricula)
+                                ->url(fn ($record) => filled($record->anexo_recibo_matricula)
                                     ? Storage::disk('public')->url($record->anexo_recibo_matricula)
                                     : null
                                 )
                                 ->openUrlInNewTab()
-                                ->visible(fn ($record) => !empty($record->anexo_recibo_matricula))
+                                ->visible(fn ($record) => filled($record->anexo_recibo_matricula))
                         ),
                 ]),
             ]),
     ]);
 }
+
 
     public static function table(Table $table): Table
     {
@@ -635,7 +637,7 @@ class PostulacionResource extends Resource
                 ->label('PDF Aprobados (Contabilidad)')
                 ->icon('heroicon-o-banknotes')
                 ->action(function () {
-                    $VALOR_APROBADO = config('becas.valor_aprobado', 0); // o fijo: 500000
+                    $VALOR_APROBADO = Setting::current()->valor_aprobado;
 
                     $postulaciones = Postulacion::query()
                         ->where('estado', 'Aprobado')

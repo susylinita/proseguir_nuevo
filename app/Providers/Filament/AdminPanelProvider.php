@@ -27,71 +27,40 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
 
-            /*
-            |--------------------------------------------------------------------------
-            | AUTH
-            |--------------------------------------------------------------------------
-            | Usamos el login nativo de Filament (estable).
-            */
+            // ✅ Login nativo de Filament (estable)
             ->login(\App\Filament\Pages\Auth\Login::class)
 
-            /*
-            |--------------------------------------------------------------------------
-            | BRANDING PROSEGUIR
-            |--------------------------------------------------------------------------
-            */
+            // ✅ Branding
             ->brandName('Fundación Proseguir')
             ->brandLogo(asset('brand/logo.png'))
             ->brandLogoHeight('2.25rem')
 
-            /*
-            |--------------------------------------------------------------------------
-            | COLORES (premium, alineados al portal)
-            |--------------------------------------------------------------------------
-            */
+            // ✅ Colores alineados al portal premium
             ->colors([
                 'primary' => Color::Blue,
                 'success' => Color::Emerald,
                 'gray'    => Color::Slate,
+                'danger'  => Color::Rose,
+                'warning' => Color::Amber,
+                'info'    => Color::Sky,
             ])
 
-            /*
-            |--------------------------------------------------------------------------
-            | THEME CSS (look premium tipo home)
-            |--------------------------------------------------------------------------
-            */
+            // ✅ Theme SOLO para Filament (no toca el portal)
             ->viteTheme('resources/css/filament/admin/theme.css')
 
-            /*
-            |--------------------------------------------------------------------------
-            | DISCOVERY
-            |--------------------------------------------------------------------------
-            */
-            ->discoverResources(
-                in: app_path('Filament/Resources'),
-                for: 'App\\Filament\\Resources'
-            )
-            ->discoverPages(
-                in: app_path('Filament/Pages'),
-                for: 'App\\Filament\\Pages'
-            )
+            // ✅ Descubre recursos/páginas/widgets
+            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
+            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
             ])
-            ->discoverWidgets(
-                in: app_path('Filament/Widgets'),
-                for: 'App\\Filament\\Widgets'
-            )
+            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
             ])
 
-            /*
-            |--------------------------------------------------------------------------
-            | MIDDLEWARE
-            |--------------------------------------------------------------------------
-            */
+            // ✅ Middleware Filament
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -103,7 +72,6 @@ class AdminPanelProvider extends PanelProvider
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
             ])
-
             ->authMiddleware([
                 Authenticate::class,
             ]);

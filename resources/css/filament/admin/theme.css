@@ -1,59 +1,41 @@
-/* Look premium tipo home (sin tocar blades de Filament) */
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-:root {
-  --proseguir-bg: #f8fafc; /* slate-50 */
+/* Fondo premium similar al home */
+.fi-body {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 40%, #eef2ff 100%);
 }
 
-/* Fondo general del panel */
-.fi-body,
-.fi-main,
-.fi-layout {
-  background: var(--proseguir-bg) !important;
-}
-
-/* Topbar/transparencia tipo premium */
+/* Topbar blur */
 .fi-topbar {
-  background: rgba(255, 255, 255, 0.80) !important;
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgb(226 232 240); /* slate-200 */
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, .75) !important;
+    border-bottom: 1px solid rgba(148, 163, 184, .35);
 }
 
-/* Sidebar un poco más limpia */
-.fi-sidebar {
-  background: rgba(255, 255, 255, 0.92) !important;
-  border-right: 1px solid rgb(226 232 240);
-}
-
-/* Cards / panels */
-.fi-section,
+/* Cards más suaves */
 .fi-card,
-.fi-widgets .fi-card {
-  border-radius: 1.25rem !important; /* similar a tus 2xl/3xl */
-  border: 1px solid rgb(226 232 240) !important;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+.fi-section,
+.fi-ta-ctn,
+.fi-fo-component-ctn {
+    border-radius: 18px !important;
+}
+
+/* Inputs más “premium” */
+.fi-input,
+.fi-select-input,
+.fi-fo-textarea,
+.fi-fo-field-wrp {
+    border-radius: 12px !important;
 }
 
 /* Botones */
 .fi-btn {
-  border-radius: 0.75rem !important;
-  font-weight: 600 !important;
+    border-radius: 12px !important;
 }
 
-/* Inputs */
-.fi-input,
-.fi-select-input,
-.fi-textarea {
-  border-radius: 0.75rem !important;
-}
-
-/* Tablas */
-.fi-ta-table {
-  border-radius: 1rem !important;
-  overflow: hidden !important;
-  border: 1px solid rgb(226 232 240) !important;
-}
-
-/* Header de página (más “limpio”) */
-.fi-header-heading {
-  letter-spacing: -0.02em;
+/* Sidebar (si la usas) */
+.fi-sidebar {
+    background: rgba(255, 255, 255, .65) !important;
+    backdrop-filter: blur(10px);
+    border-right: 1px solid rgba(148, 163, 184, .25);
 }

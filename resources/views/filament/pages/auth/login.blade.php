@@ -1,35 +1,26 @@
-<x-guest-premium-admin-layout title="Admin | Iniciar sesión - Fundación Proseguir">
+<x-filament-panels::page.simple>
+    <div class="mb-6">
+        <h2 class="text-xl font-bold text-slate-900">
+            Acceso administrativo
+        </h2>
+        <p class="mt-1 text-sm text-slate-600">
+            Inicia sesión para gestionar postulaciones, kits, aprobaciones y reportes.
+        </p>
+    </div>
 
-    {{-- (Opcional) Mensaje de estado si Filament lo usa --}}
-    @if (session('status'))
-        <div class="mb-4 text-sm font-medium text-emerald-700">
-            {{ session('status') }}
-        </div>
-    @endif
-
-    <h2 class="mb-6 text-xl font-bold text-slate-900">
-        Iniciar sesión
-    </h2>
-
-    {{-- Filament Login es Livewire: NO uses route('login') --}}
-    <form wire:submit="authenticate" class="space-y-4">
-
-        {{-- Renderiza campos oficiales de Filament (email, password, remember, etc.) --}}
+    <x-filament-panels::form wire:submit="authenticate">
         {{ $this->form }}
 
-        {{-- Botón igual al login normal --}}
-        <x-primary-button class="w-full justify-center bg-slate-900 hover:bg-slate-700">
-            Ingresar
-        </x-primary-button>
+        <x-filament-panels::form.actions
+            :actions="$this->getCachedFormActions()"
+            :full-width="true"
+        />
+    </x-filament-panels::form>
 
-        {{-- Abajo, en admin NO mostramos "Crear cuenta" (recomendado) --}}
-        <div class="pt-2 text-center text-sm text-slate-600">
-            ¿Eres postulante o acudiente?
-            <a href="{{ url('/login') }}" class="font-semibold text-blue-800 hover:text-blue-900">
-                Ingresa desde el portal
-            </a>
-        </div>
-
-    </form>
-
-</x-guest-premium-admin-layout>
+    <div class="mt-4 text-center text-sm text-slate-600">
+        ¿Eres postulante o acudiente?
+        <a href="{{ url('/') }}" class="font-semibold text-blue-800 hover:text-blue-900">
+            Ingresa desde el portal
+        </a>
+    </div>
+</x-filament-panels::page.simple>

@@ -110,7 +110,11 @@ Route::middleware(['auth', 'portal:postulantes'])
         Route::get('/postulaciones/{postulacion}', [PostulacionController::class, 'show'])->name('postulaciones.show');
         Route::get('/postulaciones/{postulacion}/edit', [PostulacionController::class, 'edit'])->name('postulaciones.edit');
         Route::put('/postulaciones/{postulacion}', [PostulacionController::class, 'update'])->name('postulaciones.update');
-    });
+    Route::middleware(['auth', 'portal:postulantes'])
+    ->get('/mi-portal/postulaciones/{postulacion}/archivo/{campo}', [PostulacionController::class, 'viewFile'])
+    ->name('student.postulaciones.file');
+
+        });
 
 /*
 |--------------------------------------------------------------------------

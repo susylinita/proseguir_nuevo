@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Student;
 use App\Http\Controllers\Controller;
 use App\Models\Postulacion;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class PostulacionController extends Controller
 {
@@ -47,7 +48,6 @@ class PostulacionController extends Controller
 
         'promedio_carrera' => ['nullable', 'numeric', 'min:0', 'max:5'],
 
-        // compatibilidad anterior
         'pdf_notas' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream'],
         'pdf_matricula' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream'],
     ];
@@ -124,7 +124,7 @@ class PostulacionController extends Controller
     // ✅ Guardado de archivos
     $fileMap = [
         'anexo_doc_identidad' => 'postulaciones/anexos',
-        'anexo_foto_documento' => 'postulaciones/anexos',
+        'anexo_foto_documento' => 'postulaciones/expedientes/'.$user->id.'/foto_documento',
         'anexo_certificado_bancario' => 'postulaciones/anexos',
         'anexo_certificado_notas' => 'postulaciones/renovacion',
         'anexo_recibo_matricula' => 'postulaciones/renovacion',
@@ -220,4 +220,35 @@ class PostulacionController extends Controller
             ->route('student.postulaciones.show', $postulacion)
             ->with('status', 'Postulación actualizada correctamente.');
     }
+
+    public function viewFile(Postulacion $postulacion, string $campo)
+{
+    $this->authorize('view', $postulacion);
+
+    $allowed = [
+        'anexo_doc_identidad',
+        'anexo_certificado_bancario',
+        'anexo_certificado_notas',
+        'anexo_recibo_matricula',
+        'pdf_notas',
+        'pdf_matricula',
+    ];
+
+    abort_unless(in_array($campo, $allowed, true), 404);
+
+    $path = $postulacion->{$campo};
+    abort_if(empty($path), 404);
+
+    $disk = Storage::disk('public');
+    abort_if(!$disk->exists($path), 404);
+
+    $mime = $disk->mimeType($path) ?? 'application/octet-stream';
+    $filename = basename($path);
+
+    // INLINE para que el navegador intente visualizar (PDF/imagen)
+    return response($disk->get($path), 200, [
+        'Content-Type' => $mime,
+        'Content-Disposition' => 'inline; filename="'.$filename.'"',
+    ]);
+}
 }

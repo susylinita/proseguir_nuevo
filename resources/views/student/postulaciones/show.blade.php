@@ -192,56 +192,87 @@
                             Las etapas pueden avanzar según revisión de coordinación y aprobación de gerencia.
                         </p>
                     </div>
-
                     {{-- Datos del estudiante --}}
                     <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Datos del estudiante</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-500 mb-4">
+                            Datos del estudiante
+                        </div>
 
-                        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <div class="text-gray-500">Nombre</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->estudiante_nombre }}</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-500">Email</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->estudiante_email }}</div>
-                            </div>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-start">
 
-                            <div>
-                                <div class="text-gray-500">Fecha de nacimiento</div>
-                                <div class="font-medium text-gray-900">
-                                    {{ $postulacion->fecha_nacimiento ? $postulacion->fecha_nacimiento->format('Y-m-d') : 'N/D' }}
+                            {{-- Info (izquierda) --}}
+                            <div class="md:col-span-2">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                                    <div>
+                                        <div class="text-gray-500">Nombre</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->estudiante_nombre }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Email</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->estudiante_email }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Fecha de nacimiento</div>
+                                        <div class="font-medium text-gray-900">
+                                            {{ $postulacion->fecha_nacimiento ? $postulacion->fecha_nacimiento->format('Y-m-d') : 'N/D' }}
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Documento de identidad</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->documento_identidad ?: 'N/D' }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Teléfono celular</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->telefono_celular ?: 'N/D' }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Teléfono fijo</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->telefono_fijo ?: 'N/D' }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Dirección</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->direccion ?: 'N/D' }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Barrio</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->barrio ?: 'N/D' }}</div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Género</div>
+                                        <div class="font-medium text-gray-900">{{ $generoLabel }}</div>
+                                    </div>
                                 </div>
                             </div>
-                            <div>
-                                <div class="text-gray-500">Documento de identidad</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->documento_identidad ?: 'N/D' }}</div>
+
+                            {{-- Foto (derecha) --}}
+                            <div class="flex justify-center md:justify-end">
+                                @if (!empty($postulacion->anexo_foto_documento))
+                                    <div class="text-center">
+                                        <img
+                                            src="{{ asset('storage/' . $postulacion->anexo_foto_documento) }}"
+                                            alt="Foto tipo documento"
+                                            class="w-36 sm:w-60 h-auto rounded-md border border-gray-300 shadow-sm"
+                                        >
+                
+                                    </div>
+                                @else
+                                    <div class="w-36 sm:w-40 h-44 sm:h-48 flex items-center justify-center rounded-md border border-dashed border-gray-300 text-xs text-gray-400 text-center px-2">
+                                        Sin foto tipo documento
+                                    </div>
+                                @endif
                             </div>
 
-                            <div>
-                                <div class="text-gray-500">Teléfono celular</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->telefono_celular ?: 'N/D' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-500">Teléfono fijo</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->telefono_fijo ?: 'N/D' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-gray-500">Dirección</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->direccion ?: 'N/D' }}</div>
-                            </div>
-                            <div>
-                                <div class="text-gray-500">Barrio</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->barrio ?: 'N/D' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-gray-500">Género</div>
-                                <div class="font-medium text-gray-900">{{ $generoLabel }}</div>
-                            </div>
                         </div>
                     </div>
+
 
                     {{-- Acudiente --}}
                     <div class="rounded-md border border-gray-200 p-4">
@@ -258,6 +289,7 @@
                             </div>
                         </div>
                     </div>
+
 
                     {{-- Estudios --}}
                     <div class="rounded-md border border-gray-200 p-4">
@@ -448,7 +480,7 @@
                             {{-- Compatibilidad con archivos antiguos --}}
                             @if ($postulacion->pdf_notas || $postulacion->pdf_matricula)
                                 <div class="pt-2 border-t border-gray-200">
-                                    <div class="text-xs uppercase tracking-wider text-gray-500 mb-2">Archivos anteriores</div>
+                                    <div class="text-xs uppercase tracking-wider text-gray-500 mb-2"></div>
 
                                     @if ($postulacion->pdf_notas)
                                         <div class="flex items-center justify-between gap-4">

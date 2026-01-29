@@ -15,63 +15,141 @@ class PostulacionController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $data = $request->validate([
-            'puntaje_saber' => ['required', 'numeric', 'min:0'],
-            'promedio_universitario' => ['required', 'numeric', 'min:0'],
-            'pdf_notas' => ['nullable', 'file', 'max:5120'],
-            'pdf_matricula' => ['nullable', 'file', 'max:5120'],
-        ]);
-        foreach (['pdf_notas', 'pdf_matricula'] as $field) {
-            if ($request->hasFile($field)) {
-                $ext = strtolower($request->file($field)->getClientOriginalExtension());
-                if ($ext !== 'pdf') {
-                    return back()->withErrors([
-                        $field => 'El archivo debe ser un PDF (.pdf).'
-                    ])->withInput();
-                }
-            }
-        }
+{
+    
+    $baseRules = [
+        'tipo_postulacion' => ['required', 'in:primer_semestre,otro_semestre,renovacion'],
 
-        // Reglas de negocio
-        if ($data['puntaje_saber'] < 300) {
-            return back()->withErrors(['puntaje_saber' => 'El puntaje Saber debe ser mínimo 300.'])->withInput();
-        }
+        'fecha_nacimiento' => ['nullable', 'date'],
+        'documento_identidad' => ['nullable', 'string', 'max:50'],
+        'telefono_fijo' => ['nullable', 'string', 'max:30'],
+        'telefono_celular' => ['required', 'string', 'max:30'],
+        'direccion' => ['nullable', 'string', 'max:120'],
+        'barrio' => ['nullable', 'string', 'max:80'],
+        'genero' => ['nullable', 'in:F,M,Otro,Prefiero no decir'],
 
-        if ($data['promedio_universitario'] < 3.8) {
-            return back()->withErrors(['promedio_universitario' => 'El promedio universitario debe ser mínimo 3.8.'])->withInput();
-        }
+        'nombre_acudiente' => ['required', 'string', 'max:120'],
+        'telefono_acudiente' => ['required', 'string', 'max:30'],
 
-        $user = auth()->user();
+        'como_encontro' => ['nullable', 'string', 'max:2000'],
 
-        // 🔒 FORZAR identidad (no viene del form)
-        $data['estudiante_nombre'] = $user->name;
-        $data['estudiante_email']  = $user->email;
+        // Bancarios (se vuelven obligatorios o no, según el tipo)
+        'banco' => ['nullable', 'string', 'max:80'],
+        'titular_cuenta' => ['nullable', 'string', 'max:120'],
+        'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente'],
+        'numero_cuenta' => ['nullable', 'string', 'max:50'],
+        'cuenta_actualizada' => ['nullable'],
 
-        // Dueño de la postulación
-        $data['user_id'] = $user->id;
+        // anexos generales (pdf/jpg/png)
+        'anexo_doc_identidad' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
+        'anexo_foto_documento' => ['required', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png'],
+        'anexo_certificado_bancario' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
 
-        // Estado inicial
-        $data['estado'] = 'Pendiente';
+        'promedio_carrera' => ['nullable', 'numeric', 'min:0', 'max:5'],
 
-        // El estudiante no llena esto
-        $data['perfil_descriptivo'] = null;
+        // compatibilidad anterior
+        'pdf_notas' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream'],
+        'pdf_matricula' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream'],
+    ];
 
-        // Archivos
-        if ($request->hasFile('pdf_notas')) {
-            $data['pdf_notas'] = $request->file('pdf_notas')->store('postulaciones/notas', 'public');
-        }
+    $tipo = $request->input('tipo_postulacion');
 
-        if ($request->hasFile('pdf_matricula')) {
-            $data['pdf_matricula'] = $request->file('pdf_matricula')->store('postulaciones/matricula', 'public');
-        }
+    // ✅ Reglas por tipo
+    if ($tipo === 'primer_semestre') {
+        $extraRules = [
+            'universidad_aplica' => ['required', 'string', 'max:160'],
+            'carrera_aplica' => ['required', 'string', 'max:160'],
 
-        $postulacion = Postulacion::create($data);
+            // Primera vez → anexos requeridos (según tu requerimiento)
+            'anexo_doc_identidad' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+            'anexo_foto_documento' => ['required', 'file', 'mimes:jpg,jpeg,png', 'max:5120'],
+            'anexo_certificado_bancario' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
 
-        return redirect()
-            ->route('student.postulaciones.show', $postulacion)
-            ->with('status', 'Postulación creada correctamente.');
+            // Bancarios requeridos en primera vez
+            'banco' => ['required', 'string', 'max:80'],
+            'titular_cuenta' => ['required', 'string', 'max:120'],
+            'tipo_cuenta' => ['required', 'in:Ahorros,Corriente'],
+            'numero_cuenta' => ['required', 'string', 'max:50'],
+        ];
+    } elseif ($tipo === 'otro_semestre') {
+        $extraRules = [
+            'universidad_actual' => ['nullable', 'string', 'max:160'],
+            'carrera_actual' => ['required', 'string', 'max:160'],
+            'semestre_en_curso' => ['required', 'integer', 'min:1', 'max:12'],
+
+            // Primera vez → anexos requeridos
+            'anexo_doc_identidad' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,image/jpeg,image/png'],
+            'anexo_foto_documento' => ['required', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png'],
+            'anexo_certificado_bancario' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,image/jpeg,image/png'],
+
+            // Bancarios requeridos en primera vez
+            'banco' => ['required', 'string', 'max:80'],
+            'titular_cuenta' => ['required', 'string', 'max:120'],
+            'tipo_cuenta' => ['required', 'in:Ahorros,Corriente'],
+            'numero_cuenta' => ['required', 'string', 'max:50'],
+        ];
+    } else { // renovacion
+        $extraRules = [
+            'pdf_notas' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf'],
+            'pdf_matricula' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf'],
+
+        ];
     }
+
+    $data = $request->validate($baseRules + $extraRules);
+
+    // ✅ Normalizar boolean checkbox
+    $data['cuenta_actualizada'] = $request->boolean('cuenta_actualizada');
+
+    $user = auth()->user();
+
+    // 🔒 Forzar identidad
+    $data['estudiante_nombre'] = $user->name;
+    $data['estudiante_email']  = $user->email;
+    $data['user_id'] = $user->id;
+
+    // Estado inicial
+    $data['estado'] = 'Pendiente';
+    $data['perfil_descriptivo'] = null;
+
+    // ✅ Si es renovación y NO actualizó cuenta: limpiar bancarios + certificado bancario
+    if ($tipo === 'renovacion' && ! $data['cuenta_actualizada']) {
+        $data['banco'] = null;
+        $data['titular_cuenta'] = null;
+        $data['tipo_cuenta'] = null;
+        $data['numero_cuenta'] = null;
+        $data['anexo_certificado_bancario'] = null;
+    }
+
+    // ✅ Guardado de archivos
+    $fileMap = [
+        'anexo_doc_identidad' => 'postulaciones/anexos',
+        'anexo_foto_documento' => 'postulaciones/anexos',
+        'anexo_certificado_bancario' => 'postulaciones/anexos',
+        'anexo_certificado_notas' => 'postulaciones/renovacion',
+        'anexo_recibo_matricula' => 'postulaciones/renovacion',
+        'pdf_notas' => 'postulaciones/notas',
+        'pdf_matricula' => 'postulaciones/matricula',
+    ];
+
+    foreach ($fileMap as $field => $dir) {
+        if ($request->hasFile($field)) {
+            $data[$field] = $request->file($field)->store($dir, 'public');
+        }
+    }
+
+    // ✅ Si no es "otro_semestre", no guardes semestre_en_curso por error
+    if ($tipo !== 'otro_semestre') {
+        $data['semestre_en_curso'] = null;
+    }
+
+    $postulacion = \App\Models\Postulacion::create($data);
+
+    return redirect()
+        ->route('student.postulaciones.show', $postulacion)
+        ->with('status', 'Postulación creada correctamente.');
+}
+
 
     public function index()
     {

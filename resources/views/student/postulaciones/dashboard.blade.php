@@ -146,25 +146,43 @@
 
                             <tbody class="divide-y divide-slate-200 bg-white">
                                 @foreach(($postulaciones ?? collect())->take(8) as $p)
+                                    @php
+                                        $tipoLabel = match ($p->tipo_postulacion) {
+                                            'primer_semestre' => 'Primer semestre',
+                                            'otro_semestre' => 'Otro semestre',
+                                            'renovacion' => 'Renovación',
+                                            default => 'N/D',
+                                        };
+                                    @endphp
+
                                     <tr class="hover:bg-slate-50 transition">
-                                        <td class="px-4 py-3 text-sm font-semibold text-slate-900">#{{ $p->id }}</td>
+                                        <td class="px-4 py-3 text-sm font-semibold text-slate-900">
+                                            #{{ $p->id }}
+                                        </td>
+
+                                        <td class="px-4 py-3 text-sm text-slate-700">
+                                            {{ $tipoLabel }}
+                                        </td>
+
                                         <td class="px-4 py-3 text-sm text-slate-700">
                                             <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold
                                                 @if(($p->estado ?? '') === 'Aprobado') bg-emerald-50 text-emerald-800
                                                 @elseif(($p->estado ?? '') === 'Rechazado') bg-red-50 text-red-800
-                                                @elseif(($p->estado ?? '') === 'Preseleccionado') bg-blue-50 text-blue-800
+                                                @elseif(($p->estado ?? '') === 'Entrevista') bg-blue-50 text-blue-800
                                                 @else bg-slate-100 text-slate-800
                                                 @endif
                                             ">
-                                                {{ $p->estado ?? 'N/D' }}
+                                                {{ $p->estado ?? 'Pendiente' }}
                                             </span>
                                         </td>
+
                                         <td class="px-4 py-3 text-sm text-slate-700">
                                             {{ optional($p->updated_at)->format('Y-m-d H:i') }}
                                         </td>
+
                                         <td class="px-4 py-3 text-sm text-right">
                                             <a href="{{ route('student.postulaciones.show', $p) }}"
-                                               class="font-semibold text-blue-800 hover:text-blue-900">
+                                            class="font-semibold text-blue-800 hover:text-blue-900">
                                                 Ver →
                                             </a>
                                         </td>

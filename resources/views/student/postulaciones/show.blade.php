@@ -31,20 +31,45 @@
 
         $badge = 'bg-gray-100 text-gray-800';
         if ($estado === 'Pendiente') $badge = 'bg-yellow-100 text-yellow-800';
-        if ($estado === 'Preseleccionado') $badge = 'bg-blue-100 text-blue-800';
+        if ($estado === 'Entrevista') $badge = 'bg-blue-100 text-blue-800';
         if ($estado === 'Aprobado') $badge = 'bg-green-100 text-green-800';
         if ($estado === 'Rechazado') $badge = 'bg-red-100 text-red-800';
 
+        $tipo = $postulacion->tipo_postulacion ?? 'primer_semestre';
+        $tipoLabel = match ($tipo) {
+            'primer_semestre' => 'Ingreso a primer semestre (primera vez)',
+            'otro_semestre' => 'Ingreso a otro semestre (primera vez)',
+            'renovacion' => 'Renovación (ya becado)',
+            default => 'N/D',
+        };
+
+        // Pendientes (según tipo)
         $pendientes = [];
-        if (!$postulacion->pdf_notas) $pendientes[] = 'PDF de notas';
-        if (!$postulacion->pdf_matricula) $pendientes[] = 'PDF de matrícula';
+
+        if ($tipo === 'renovacion') {
+            if (empty($postulacion->anexo_certificado_notas)) $pendientes[] = 'Certificado de notas';
+            if (empty($postulacion->anexo_recibo_matricula)) $pendientes[] = 'Recibo de matrícula';
+        } else {
+            if (empty($postulacion->anexo_doc_identidad)) $pendientes[] = 'Documento de identidad';
+            if (empty($postulacion->anexo_foto_documento)) $pendientes[] = 'Foto tipo documento';
+            if (empty($postulacion->anexo_certificado_bancario)) $pendientes[] = 'Certificado cuenta bancaria';
+            if (is_null($postulacion->promedio_carrera)) $pendientes[] = 'Promedio de carrera';
+        }
+
+        // Compatibilidad con los campos antiguos
+        if (!empty($postulacion->pdf_notas) === false && !empty($postulacion->pdf_matricula) === false) {
+            // no forzamos pendientes aquí
+        }
 
         // Etapas para timeline visual
-        $etapas = ['Pendiente', 'Preseleccionado', 'Aprobado'];
+        $etapas = ['Pendiente', 'Entrevista', 'Aprobado'];
         $rechazada = ($estado === 'Rechazado');
 
         $indiceEstado = array_search($estado, $etapas, true);
         $indiceEstado = ($indiceEstado === false) ? -1 : $indiceEstado;
+
+        // Helpers de display
+        $generoLabel = $postulacion->genero ?: 'N/D';
     @endphp
 
     <div class="py-12">
@@ -60,13 +85,20 @@
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                 <div class="p-6 text-gray-900 space-y-4">
 
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                         <div class="rounded-md border border-gray-200 p-4">
                             <div class="text-xs uppercase tracking-wider text-gray-500">Estado</div>
                             <div class="mt-2">
                                 <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badge }}">
                                     {{ $estado }}
                                 </span>
+                            </div>
+                        </div>
+
+                        <div class="rounded-md border border-gray-200 p-4">
+                            <div class="text-xs uppercase tracking-wider text-gray-500">Tipo</div>
+                            <div class="mt-2 text-sm font-medium text-gray-900">
+                                {{ $tipoLabel }}
                             </div>
                         </div>
 
@@ -78,7 +110,7 @@
                         </div>
 
                         <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Documentos pendientes</div>
+                            <div class="text-xs uppercase tracking-wider text-gray-500">Pendientes</div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
                                 {{ count($pendientes) }}
                             </div>
@@ -87,11 +119,11 @@
 
                     {{-- Documentos pendientes (CTA) --}}
                     <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Documentos pendientes o incompletos</div>
+                        <div class="text-xs uppercase tracking-wider text-gray-500">Pendientes o incompletos</div>
 
                         @if (count($pendientes) === 0)
                             <div class="mt-2 text-sm text-green-700">
-                                ¡Todo completo! No tienes documentos pendientes.
+                                ¡Todo completo! No tienes pendientes.
                             </div>
                         @else
                             <ul class="mt-2 list-disc list-inside text-sm text-gray-800">
@@ -104,18 +136,18 @@
                                 <div class="mt-3">
                                     <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
                                        class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
-                                        Completar documentos
+                                        Completar información
                                     </a>
                                 </div>
                             @else
                                 <div class="mt-3 text-sm text-gray-600">
-                                    Tu postulación ya no está en Pendiente. Si necesitas actualizar documentos, contacta a coordinación.
+                                    Tu postulación ya no está en Pendiente. Si necesitas actualizar, contacta a coordinación.
                                 </div>
                             @endif
                         @endif
                     </div>
 
-                    {{-- Timeline visual (por etapas) --}}
+                    {{-- Timeline visual --}}
                     <div class="rounded-md border border-gray-200 p-4">
                         <div class="text-xs uppercase tracking-wider text-gray-500">Estado visual</div>
 
@@ -174,14 +206,132 @@
                                 <div class="text-gray-500">Email</div>
                                 <div class="font-medium text-gray-900">{{ $postulacion->estudiante_email }}</div>
                             </div>
+
                             <div>
-                                <div class="text-gray-500">Puntaje Saber</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->puntaje_saber }}</div>
+                                <div class="text-gray-500">Fecha de nacimiento</div>
+                                <div class="font-medium text-gray-900">
+                                    {{ $postulacion->fecha_nacimiento ? $postulacion->fecha_nacimiento->format('Y-m-d') : 'N/D' }}
+                                </div>
                             </div>
                             <div>
-                                <div class="text-gray-500">Promedio universitario</div>
-                                <div class="font-medium text-gray-900">{{ $postulacion->promedio_universitario }}</div>
+                                <div class="text-gray-500">Documento de identidad</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->documento_identidad ?: 'N/D' }}</div>
                             </div>
+
+                            <div>
+                                <div class="text-gray-500">Teléfono celular</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->telefono_celular ?: 'N/D' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500">Teléfono fijo</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->telefono_fijo ?: 'N/D' }}</div>
+                            </div>
+
+                            <div>
+                                <div class="text-gray-500">Dirección</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->direccion ?: 'N/D' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500">Barrio</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->barrio ?: 'N/D' }}</div>
+                            </div>
+
+                            <div>
+                                <div class="text-gray-500">Género</div>
+                                <div class="font-medium text-gray-900">{{ $generoLabel }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Acudiente --}}
+                    <div class="rounded-md border border-gray-200 p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-500">Datos del acudiente</div>
+
+                        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <div class="text-gray-500">Nombre</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->nombre_acudiente ?: 'N/D' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500">Teléfono</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->telefono_acudiente ?: 'N/D' }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Estudios --}}
+                    <div class="rounded-md border border-gray-200 p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-500">Estudios</div>
+
+                        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            @if ($tipo === 'primer_semestre')
+                                <div>
+                                    <div class="text-gray-500">Universidad a la que aplica</div>
+                                    <div class="font-medium text-gray-900">{{ $postulacion->universidad_aplica ?: 'N/D' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">Carrera (pregrado)</div>
+                                    <div class="font-medium text-gray-900">{{ $postulacion->carrera_aplica ?: 'N/D' }}</div>
+                                </div>
+                            @elseif ($tipo === 'otro_semestre')
+                                <div>
+                                    <div class="text-gray-500">Universidad (actual)</div>
+                                    <div class="font-medium text-gray-900">{{ $postulacion->universidad_actual ?: 'N/D' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">Carrera (pregrado)</div>
+                                    <div class="font-medium text-gray-900">{{ $postulacion->carrera_actual ?: 'N/D' }}</div>
+                                </div>
+                                <div>
+                                    <div class="text-gray-500">Semestre en curso</div>
+                                    <div class="font-medium text-gray-900">{{ $postulacion->semestre_en_curso ?: 'N/D' }}</div>
+                                </div>
+                            @else
+                                <div class="sm:col-span-2 text-sm text-gray-700">
+                                    Renovación: solo se validan documentos de notas y matrícula (y cuenta bancaria si cambió).
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Datos bancarios --}}
+                    <div class="rounded-md border border-gray-200 p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-500">Datos bancarios</div>
+
+                        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                            <div>
+                                <div class="text-gray-500">Banco</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->banco ?: 'N/D' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500">Titular</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->titular_cuenta ?: 'N/D' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500">Tipo de cuenta</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->tipo_cuenta ?: 'N/D' }}</div>
+                            </div>
+                            <div>
+                                <div class="text-gray-500">Número de cuenta</div>
+                                <div class="font-medium text-gray-900">{{ $postulacion->numero_cuenta ?: 'N/D' }}</div>
+                            </div>
+
+                            @if ($tipo === 'renovacion')
+                                <div class="sm:col-span-2">
+                                    <div class="text-gray-500">Cuenta actualizada</div>
+                                    <div class="font-medium text-gray-900">
+                                        {{ $postulacion->cuenta_actualizada ? 'Sí' : 'No' }}
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Información adicional --}}
+                    <div class="rounded-md border border-gray-200 p-4">
+                        <div class="text-xs uppercase tracking-wider text-gray-500">Información adicional</div>
+                        <div class="mt-2 text-sm text-gray-800 whitespace-pre-line">
+                            {{ $postulacion->como_encontro ?: 'Sin respuesta.' }}
                         </div>
                     </div>
 
@@ -193,44 +343,142 @@
                         </div>
                     </div>
 
-                    {{-- Documentos (con links) --}}
+                    {{-- Documentos / Anexos --}}
                     <div class="rounded-md border border-gray-200 p-4">
                         <div class="text-xs uppercase tracking-wider text-gray-500">Documentos</div>
 
                         <div class="mt-3 space-y-3 text-sm">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <div class="font-medium text-gray-900">PDF Notas</div>
-                                    <div class="text-gray-500">
-                                        {{ $postulacion->pdf_notas ? basename($postulacion->pdf_notas) : 'No adjuntado' }}
+
+                            @if ($tipo === 'renovacion')
+                                {{-- Renovación --}}
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Certificado de notas</div>
+                                        <div class="text-gray-500">
+                                            {{ $postulacion->anexo_certificado_notas ? basename($postulacion->anexo_certificado_notas) : 'No adjuntado' }}
+                                        </div>
                                     </div>
+
+                                    @if ($postulacion->anexo_certificado_notas)
+                                        <a class="text-indigo-600 hover:text-indigo-900"
+                                           href="{{ asset('storage/' . $postulacion->anexo_certificado_notas) }}"
+                                           target="_blank" rel="noopener">
+                                            Abrir
+                                        </a>
+                                    @endif
                                 </div>
 
-                                @if ($postulacion->pdf_notas)
-                                    <a class="text-indigo-600 hover:text-indigo-900"
-                                       href="{{ asset('storage/' . $postulacion->pdf_notas) }}"
-                                       target="_blank" rel="noopener">
-                                        Abrir
-                                    </a>
-                                @endif
-                            </div>
-
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <div class="font-medium text-gray-900">PDF Matrícula</div>
-                                    <div class="text-gray-500">
-                                        {{ $postulacion->pdf_matricula ? basename($postulacion->pdf_matricula) : 'No adjuntado' }}
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Recibo de matrícula</div>
+                                        <div class="text-gray-500">
+                                            {{ $postulacion->anexo_recibo_matricula ? basename($postulacion->anexo_recibo_matricula) : 'No adjuntado' }}
+                                        </div>
                                     </div>
+
+                                    @if ($postulacion->anexo_recibo_matricula)
+                                        <a class="text-indigo-600 hover:text-indigo-900"
+                                           href="{{ asset('storage/' . $postulacion->anexo_recibo_matricula) }}"
+                                           target="_blank" rel="noopener">
+                                            Abrir
+                                        </a>
+                                    @endif
+                                </div>
+                            @else
+                                {{-- Primera vez --}}
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Documento de identidad</div>
+                                        <div class="text-gray-500">
+                                            {{ $postulacion->anexo_doc_identidad ? basename($postulacion->anexo_doc_identidad) : 'No adjuntado' }}
+                                        </div>
+                                    </div>
+
+                                    @if ($postulacion->anexo_doc_identidad)
+                                        <a class="text-indigo-600 hover:text-indigo-900"
+                                           href="{{ asset('storage/' . $postulacion->anexo_doc_identidad) }}"
+                                           target="_blank" rel="noopener">
+                                            Abrir
+                                        </a>
+                                    @endif
                                 </div>
 
-                                @if ($postulacion->pdf_matricula)
-                                    <a class="text-indigo-600 hover:text-indigo-900"
-                                       href="{{ asset('storage/' . $postulacion->pdf_matricula) }}"
-                                       target="_blank" rel="noopener">
-                                        Abrir
-                                    </a>
-                                @endif
-                            </div>
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Foto tipo documento</div>
+                                        <div class="text-gray-500">
+                                            {{ $postulacion->anexo_foto_documento ? basename($postulacion->anexo_foto_documento) : 'No adjuntado' }}
+                                        </div>
+                                    </div>
+
+                                    @if ($postulacion->anexo_foto_documento)
+                                        <a class="text-indigo-600 hover:text-indigo-900"
+                                           href="{{ asset('storage/' . $postulacion->anexo_foto_documento) }}"
+                                           target="_blank" rel="noopener">
+                                            Abrir
+                                        </a>
+                                    @endif
+                                </div>
+
+                                <div class="flex items-center justify-between gap-4">
+                                    <div>
+                                        <div class="font-medium text-gray-900">Certificado cuenta bancaria</div>
+                                        <div class="text-gray-500">
+                                            {{ $postulacion->anexo_certificado_bancario ? basename($postulacion->anexo_certificado_bancario) : 'No adjuntado' }}
+                                        </div>
+                                    </div>
+
+                                    @if ($postulacion->anexo_certificado_bancario)
+                                        <a class="text-indigo-600 hover:text-indigo-900"
+                                           href="{{ asset('storage/' . $postulacion->anexo_certificado_bancario) }}"
+                                           target="_blank" rel="noopener">
+                                            Abrir
+                                        </a>
+                                    @endif
+                                </div>
+
+                                <div class="rounded-md bg-gray-50 p-3">
+                                    <div class="text-gray-500 text-xs uppercase tracking-wider">Promedio de carrera</div>
+                                    <div class="font-medium text-gray-900">
+                                        {{ is_null($postulacion->promedio_carrera) ? 'N/D' : $postulacion->promedio_carrera }}
+                                    </div>
+                                </div>
+                            @endif
+
+                            {{-- Compatibilidad con archivos antiguos --}}
+                            @if ($postulacion->pdf_notas || $postulacion->pdf_matricula)
+                                <div class="pt-2 border-t border-gray-200">
+                                    <div class="text-xs uppercase tracking-wider text-gray-500 mb-2">Archivos anteriores</div>
+
+                                    @if ($postulacion->pdf_notas)
+                                        <div class="flex items-center justify-between gap-4">
+                                            <div>
+                                                <div class="font-medium text-gray-900">PDF Notas</div>
+                                                <div class="text-gray-500">{{ basename($postulacion->pdf_notas) }}</div>
+                                            </div>
+                                            <a class="text-indigo-600 hover:text-indigo-900"
+                                               href="{{ asset('storage/' . $postulacion->pdf_notas) }}"
+                                               target="_blank" rel="noopener">
+                                                Abrir
+                                            </a>
+                                        </div>
+                                    @endif
+
+                                    @if ($postulacion->pdf_matricula)
+                                        <div class="flex items-center justify-between gap-4 mt-2">
+                                            <div>
+                                                <div class="font-medium text-gray-900">PDF Matrícula</div>
+                                                <div class="text-gray-500">{{ basename($postulacion->pdf_matricula) }}</div>
+                                            </div>
+                                            <a class="text-indigo-600 hover:text-indigo-900"
+                                               href="{{ asset('storage/' . $postulacion->pdf_matricula) }}"
+                                               target="_blank" rel="noopener">
+                                                Abrir
+                                            </a>
+                                        </div>
+                                    @endif
+                                </div>
+                            @endif
                         </div>
 
                         <p class="mt-4 text-xs text-gray-500">
@@ -241,7 +489,7 @@
                 </div>
             </div>
 
-            {{-- Historial real (si ya creaste la tabla postulacion_estado_historias y la relación) --}}
+            {{-- Historial real --}}
             @if (method_exists($postulacion, 'historicoEstados') && $postulacion->relationLoaded('historicoEstados'))
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">

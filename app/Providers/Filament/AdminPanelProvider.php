@@ -58,6 +58,8 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 Widgets\AccountWidget::class,
                 Widgets\FilamentInfoWidget::class,
+                \App\Filament\Widgets\PostulacionesComiteStats::class,
+                \App\Filament\Widgets\PostulacionesComiteTable::class,
             ])
 
             // ✅ Middleware Filament

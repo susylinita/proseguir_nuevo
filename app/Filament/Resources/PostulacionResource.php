@@ -17,7 +17,9 @@ use Filament\Infolists\Components\Grid;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Infolists\Components\ImageEntry;
 use Filament\Infolists\Components\IconEntry;
-use Filament\Infolists\Components\Actions\Action;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Filament\Tables\Actions\Action;
+
 
 use Illuminate\Support\Facades\Storage;
 
@@ -606,6 +608,52 @@ class PostulacionResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->headerActions([
+    // ✅ 1) General (Coordinación) - déjalo como ya lo tienes
+    Action::make('export_pdf_general')
+        ->label('PDF General (Coordinación)')
+        ->icon('heroicon-o-document-arrow-down')
+        ->action(function () {
+            $postulaciones = Postulacion::query()
+                ->latest()
+                ->get();
+
+            $fecha = now();
+            $titulo = 'Reporte General - Coordinación';
+
+            $pdf = Pdf::loadView('pdf.coordinacion-general', compact('postulaciones', 'fecha', 'titulo'))
+                ->setPaper('a4', 'landscape');
+
+            return response()->streamDownload(
+                fn () => print($pdf->output()),
+                'reporte_coordinacion_general_' . $fecha->format('Ymd_His') . '.pdf'
+            );
+        }),
+
+        // ✅ 2) Contabilidad - SOLO APROBADOS
+            Action::make('export_pdf_aprobados')
+                ->label('PDF Aprobados (Contabilidad)')
+                ->icon('heroicon-o-banknotes')
+                ->action(function () {
+                    $VALOR_APROBADO = config('becas.valor_aprobado', 0); // o fijo: 500000
+
+                    $postulaciones = Postulacion::query()
+                        ->where('estado', 'Aprobado')
+                        ->latest()
+                        ->get();
+
+                    $fecha = now();
+                    $titulo = 'Planilla de Pagos - Contabilidad (Aprobados)';
+
+                    $pdf = Pdf::loadView('pdf.coordinacion-contabilidad', compact('postulaciones', 'fecha', 'titulo', 'VALOR_APROBADO'))
+                        ->setPaper('a4', 'portrait');
+
+                    return response()->streamDownload(
+                        fn () => print($pdf->output()),
+                        'planilla_contabilidad_aprobados_' . $fecha->format('Ymd_His') . '.pdf'
+                    );
+                }),
+        ])
             ->columns([
                 Tables\Columns\TextColumn::make('estudiante_nombre')
                     ->label('Postulante')

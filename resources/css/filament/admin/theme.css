@@ -19,10 +19,11 @@
 .fi-wi,
 .fi-ta-content,
 .fi-fo-component-ctn {
-  border-radius: 1.25rem !important;
-  border: 1px solid rgb(226 232 240) !important;
-  box-shadow: 0 20px 35px -30px rgba(15, 23, 42, 0.35) !important;
+  border-radius: 0 !important;
+  box-shadow: 0 8px 20px -12px rgba(15, 23, 42, 0.25) !important;
+  overflow: hidden;
 }
+
 
 .fi-sidebar {
   background: rgba(255, 255, 255, 0.85) !important;

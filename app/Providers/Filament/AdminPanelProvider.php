@@ -27,6 +27,8 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->maxContentWidth('full')
+            ->sidebarCollapsibleOnDesktop(false)
+            ->sidebarFullyCollapsibleOnDesktop(false)
 
             // ✅ Login nativo de Filament (estable)
             ->login(\App\Filament\Pages\Auth\Login::class)

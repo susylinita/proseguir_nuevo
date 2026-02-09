@@ -150,3 +150,4 @@ Route::middleware(['auth'])
         Route::get('/{registro}/documento', [KitArchivoController::class, 'documento'])->name('documento');
         Route::get('/{registro}/certificado', [KitArchivoController::class, 'certificado'])->name('certificado');
     });
+

@@ -49,6 +49,8 @@ class Postulacion extends Model
         'anexo_certificado_notas',
         'anexo_recibo_matricula',
 
+        'observaciones_entrevista',
+
         // existentes
         'puntaje_saber',
         'promedio_universitario',

@@ -79,5 +79,11 @@ class Postulacion extends Model
     {
         return $this->hasMany(\App\Models\PostulacionPromedio::class);
     }
+
+    public function estadoActualizadoPor()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'estado_actualizado_por');
+    }
+
 }
 

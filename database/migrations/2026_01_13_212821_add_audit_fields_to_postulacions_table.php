@@ -12,11 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('postulacions', function (Blueprint $table) {
-            $table->foreignId('estado_actualizado_por')->nullable()->constrained('users')->nullOnDelete();
-            $table->timestamp('estado_actualizado_en')->nullable();
+            $table->unsignedBigInteger('estado_actualizado_por')->nullable()->after('estado');
+            $table->timestamp('estado_actualizado_en')->nullable()->after('estado_actualizado_por');
 
-            $table->timestamp('aprobado_en')->nullable();
-            $table->timestamp('rechazado_en')->nullable();
+            $table->foreign('estado_actualizado_por')
+                ->references('id')->on('users')
+                ->nullOnDelete();
         });
     }
 

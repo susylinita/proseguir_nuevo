@@ -31,7 +31,7 @@ class PostulacionResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->hasAnyRole(['coordinador', 'gerente']) ?? false;
+        return auth()->user()?->hasRole('admin_panel') ?? false;
     }
 
     public static function canEdit($record): bool
@@ -43,7 +43,7 @@ class PostulacionResource extends Resource
             return false;
         }
 
-        return $user->hasAnyRole(['coordinador', 'gerente']);
+        return auth()->user()?->hasRole('admin_panel') ?? false;
     }
 
     public static function canDelete($record): bool
@@ -51,7 +51,7 @@ class PostulacionResource extends Resource
         $user = auth()->user();
         if (! $user) return false;
 
-        return $user->hasRole('gerente');
+        return auth()->user()?->hasRole('admin_panel') ?? false;
     }
 
     public static function form(Form $form): Form
@@ -757,8 +757,11 @@ public static function infolist(Infolist $infolist): Infolist
                         && $record->estado === 'Pendiente'
                     )
                     ->action(function ($record) {
-                        $record->update(['estado' => 'Entrevista']);
-
+                        $record->update([
+                        'estado' => 'Entrevista',
+                        'estado_actualizado_por' => auth()->id(),
+                        'estado_actualizado_en' => now(),
+                    ]);
                         Notification::make()
                             ->title('Postulación marcada para entrevista')
                             ->success()

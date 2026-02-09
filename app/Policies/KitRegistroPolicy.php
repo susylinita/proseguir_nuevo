@@ -7,33 +7,34 @@ use App\Models\User;
 
 class KitRegistroPolicy
 {
-    public function viewAny(User $user): bool
+    private function isPanelAdmin(User $user): bool
     {
-        return $user->is_admin
-            || $user->hasRole(['coordinador', 'gerente']);
+        return ($user->is_admin ?? false) || $user->hasRole('admin_panel');
     }
 
-    public function view(User $user, KitRegistro $registro): bool
+    public function viewAny(User $user): bool
     {
-        return $user->is_admin
-            || $user->hasRole(['coordinador', 'gerente']);
+        return $this->isPanelAdmin($user);
+    }
+
+    public function view(User $user, $registro): bool
+    {
+        return $this->isPanelAdmin($user);
     }
 
     public function create(User $user): bool
     {
-        return $user->is_admin
-            || $user->hasRole(['coordinador', 'gerente']);
+        return $this->isPanelAdmin($user);
     }
 
-    public function update(User $user, KitRegistro $registro): bool
+    public function update(User $user, $registro): bool
     {
-        return $user->is_admin
-            || $user->hasRole(['coordinador', 'gerente']);
+        return $this->isPanelAdmin($user);
     }
 
-    public function delete(User $user, KitRegistro $registro): bool
+    public function delete(User $user, $registro): bool
     {
-        return $user->is_admin
-            || $user->hasRole(['coordinador', 'gerente']);
+        return $this->isPanelAdmin($user);
     }
 }
+

@@ -7,34 +7,31 @@ use App\Models\User;
 
 class PostulacionPolicy
 {
+    private function isPanelAdmin(User $user): bool
+    {
+        return ($user->is_admin ?? false) || $user->hasRole('admin_panel');
+    }
+
     public function viewAny(User $user): bool
     {
-        return (bool) ($user->is_admin ?? false) || $user->hasRole(['coordinador', 'gerente']);
+        return $this->isPanelAdmin($user);
     }
 
     public function view(User $user, Postulacion $postulacion): bool
     {
-        return (bool) ($user->is_admin ?? false)
-            || $user->hasRole(['coordinador', 'gerente'])
+        return $this->isPanelAdmin($user)
             || $postulacion->user_id === $user->id;
     }
 
     public function update(User $user, Postulacion $postulacion): bool
     {
-        // Admin / Coordinación / Gerencia: siempre pueden editar
-        if ((bool) ($user->is_admin ?? false) || $user->hasRole(['coordinador', 'gerente'])) {
-            return true;
-        }
-
-        // Estudiante (dueño): solo si está en Pendiente
-        return $postulacion->user_id === $user->id
-            && ($postulacion->estado ?? '') === 'Pendiente';
+        return $this->isPanelAdmin($user);
     }
 
     public function delete(User $user, Postulacion $postulacion): bool
     {
-        return (bool) ($user->is_admin ?? false)
-            || $user->hasRole(['coordinador', 'gerente']);
+        return $this->isPanelAdmin($user);
     }
 }
+
 

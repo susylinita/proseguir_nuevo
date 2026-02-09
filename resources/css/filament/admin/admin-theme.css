@@ -1,69 +1,32 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
 
-/* Premium look SOLO para Filament Admin */
+/* ✅ NO PONGAS @tailwind aquí */
 
-@layer base {
-  /* Fondo general tipo “premium” */
-  body {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #f1f5f9 100%);
-  }
+/* Fondo premium */
+.fi-body {
+  background: linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #f1f5f9 100%);
 }
 
-/* Layout principal (Filament) */
-@layer components {
-  /* Fondo con “blobs” suaves tipo tu home */
-  .fi-layout {
-    position: relative;
-    min-height: 100vh;
-  }
+/* Topbar blur */
+.fi-topbar > div {
+  background: rgba(255, 255, 255, 0.80) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgb(226 232 240);
+}
 
-  .fi-layout::before,
-  .fi-layout::after {
-    content: "";
-    position: fixed;
-    z-index: -1;
-    filter: blur(60px);
-    opacity: 0.35;
-    width: 420px;
-    height: 420px;
-    border-radius: 9999px;
-  }
+/* Cards */
+.fi-section,
+.fi-wi,
+.fi-ta-content,
+.fi-fo-component-ctn {
+  border-radius: 1.25rem !important;
+  border: 1px solid rgb(226 232 240) !important;
+  box-shadow: 0 20px 35px -30px rgba(15, 23, 42, 0.35) !important;
+}
 
-  .fi-layout::before {
-    top: -120px;
-    right: -140px;
-    background: #a7f3d0; /* emerald-200 */
-  }
-
-  .fi-layout::after {
-    bottom: -140px;
-    left: -160px;
-    background: #bfdbfe; /* blue-200 */
-  }
-
-  /* Barra superior con blur similar */
-  .fi-topbar > div {
-    background: rgba(255, 255, 255, 0.80) !important;
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgb(226 232 240); /* slate-200 */
-  }
-
-  /* Cards más “premium” */
-  .fi-section,
-  .fi-wi,
-  .fi-ta-content,
-  .fi-fo-component-ctn {
-    border-radius: 1.25rem !important; /* 2xl */
-    border: 1px solid rgb(226 232 240) !important; /* slate-200 */
-    box-shadow: 0 20px 35px -30px rgba(15, 23, 42, 0.35) !important;
-  }
-
-  /* Sidebar un poco más limpia */
-  .fi-sidebar {
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(10px);
-    border-right: 1px solid rgb(226 232 240);
-  }
+/* Sidebar */
+.fi-sidebar {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgb(226 232 240);
 }

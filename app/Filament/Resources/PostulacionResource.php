@@ -28,6 +28,11 @@ class PostulacionResource extends Resource
     protected static ?string $model = Postulacion::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
+    protected static ?string $navigationLabel = 'Postulaciones';
+    protected static ?string $modelLabel = 'Postulación';
+    protected static ?string $pluralModelLabel = 'Postulaciones';
+
+
 
     public static function canCreate(): bool
     {
@@ -262,6 +267,17 @@ class PostulacionResource extends Resource
                     ->options(function () {
                         $user = auth()->user();
 
+                        // ✅ Nuevo: Admin (o is_admin)
+                        if (($user->is_admin ?? false) || $user?->hasRole('admin')) {
+                            return [
+                                'Pendiente' => 'Pendiente',
+                                'Entrevista' => 'Entrevista',
+                                'Aprobado' => 'Aprobado',
+                                'Rechazado' => 'Rechazado',
+                            ];
+                        }
+
+                        // Compatibilidad por si aún usas roles separados
                         if ($user?->hasRole('gerente')) {
                             return [
                                 'Pendiente' => 'Pendiente',
@@ -281,6 +297,7 @@ class PostulacionResource extends Resource
 
                         return [];
                     })
+
                     ->required()
                     ->disabled(fn ($record) => $record && $record->estado === 'Aprobado'),
 
@@ -304,17 +321,18 @@ class PostulacionResource extends Resource
                     ->columnSpanFull()
                     ->visible(function ($record) {
                         $user = auth()->user();
-                        if (! $user?->hasAnyRole(['coordinador', 'gerente'])) return false;
 
-                        // en create no mostrar
-                        if (! $record) return false;
+                        $puede = ($user->is_admin ?? false) || $user?->hasRole('admin') || $user?->hasRole('gerente');
 
-                        return in_array($record->estado, ['Entrevista', 'Aprobado'], true);
+                        return $puede && $record->estado === 'Entrevista';
                     })
+
+
                     ->disabled(function ($record) {
                         if (! $record) return true;
                         return $record->estado !== 'Entrevista';
-                    }),
+                    })
+
             ])
             ->columns(1),
     ]);
@@ -748,22 +766,23 @@ public static function infolist(Infolist $infolist): Infolist
             ])
             ->actions([
                 Tables\Actions\Action::make('preseleccionar')
-                    ->label('Preseleccionar')
-                    ->icon('heroicon-o-star')
-                    ->color('warning')
+                    ->label('Pasar a entrevista')
+                    ->icon('heroicon-o-chat-bubble-left-right')
+                    ->color('info')
                     ->requiresConfirmation()
                     ->visible(fn ($record) =>
-                        auth()->user()?->hasRole('coordinador')
-                        && $record->estado === 'Pendiente'
+                        auth()->user()?->hasRole('admin_panel') &&
+                        $record->estado === 'Pendiente'
                     )
                     ->action(function ($record) {
                         $record->update([
-                        'estado' => 'Entrevista',
-                        'estado_actualizado_por' => auth()->id(),
-                        'estado_actualizado_en' => now(),
-                    ]);
+                            'estado' => 'Entrevista',
+                            'estado_actualizado_por' => auth()->id(),
+                            'estado_actualizado_en' => now(),
+                        ]);
+
                         Notification::make()
-                            ->title('Postulación marcada para entrevista')
+                            ->title('Postulación enviada a entrevista')
                             ->success()
                             ->send();
                     }),
@@ -773,12 +792,21 @@ public static function infolist(Infolist $infolist): Infolist
                     ->icon('heroicon-o-check-badge')
                     ->color('success')
                     ->requiresConfirmation()
-                    ->visible(fn ($record) =>
-                        auth()->user()?->hasRole('gerente')
-                        && $record->estado === 'Entrevista'
-                    )
+                    ->visible(function ($record) {
+                        $user = auth()->user();
+                        if (! $record) return false;
+
+                        return $user?->hasRole('admin_panel')
+                            && in_array($record->estado, ['Entrevista', 'Aprobado'], true);
+                    })
+                    ->disabled(fn ($record) => ! $record || $record->estado !== 'Entrevista')
+
                     ->action(function ($record) {
-                        $record->update(['estado' => 'Aprobado']);
+                        $record->update([
+                            'estado' => 'Aprobado',
+                            'estado_actualizado_por' => auth()->id(),
+                            'estado_actualizado_en' => now(),
+                        ]);
 
                         Notification::make()
                             ->title('Postulación aprobada')
@@ -792,12 +820,15 @@ public static function infolist(Infolist $infolist): Infolist
                     ->color('danger')
                     ->requiresConfirmation()
                     ->visible(fn ($record) =>
-                        auth()->user()?->hasAnyRole(['coordinador', 'gerente'])
-                        && $record->estado !== 'Aprobado'
-                        && $record->estado !== 'Rechazado'
+                        auth()->user()?->hasRole('admin_panel') &&
+                        ! in_array($record->estado, ['Aprobado', 'Rechazado'], true)
                     )
                     ->action(function ($record) {
-                        $record->update(['estado' => 'Rechazado']);
+                        $record->update([
+                            'estado' => 'Rechazado',
+                            'estado_actualizado_por' => auth()->id(),
+                            'estado_actualizado_en' => now(),
+                        ]);
 
                         Notification::make()
                             ->title('Postulación rechazada')
@@ -805,10 +836,11 @@ public static function infolist(Infolist $infolist): Infolist
                             ->send();
                     }),
 
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make()->visible(fn ($record) => static::canEdit($record)),
-                Tables\Actions\DeleteAction::make()->visible(fn ($record) => static::canDelete($record)),
+                Tables\Actions\ViewAction::make()->label('Ver'),
+                Tables\Actions\EditAction::make()->label('Editar')->visible(fn ($record) => static::canEdit($record)),
+                Tables\Actions\DeleteAction::make()->label('Eliminar')->visible(fn ($record) => static::canDelete($record)),
             ])
+
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()

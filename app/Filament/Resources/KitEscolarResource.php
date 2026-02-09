@@ -23,6 +23,10 @@ class KitEscolarResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-gift'; // Un regalo o maletín
 
+    protected static ?string $navigationLabel = 'Kits Escolares';
+    protected static ?string $modelLabel = 'Kit Escolar';
+    protected static ?string $pluralModelLabel = 'Kits Escolares';
+
     protected static ?int $navigationSort = 2; // El número 1 sería para Postulaciones
 
     public static function form(Form $form): Form

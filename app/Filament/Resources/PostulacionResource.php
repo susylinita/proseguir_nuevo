@@ -649,6 +649,7 @@ public static function infolist(Infolist $infolist): Infolist
     public static function table(Table $table): Table
     {
         return $table
+            ->defaultSort('promedio_universitario', 'asc')
             ->headerActions([
     // ✅ 1) General (Coordinación) - déjalo como ya lo tienes
     Action::make('export_pdf_general')
@@ -695,10 +696,17 @@ public static function infolist(Infolist $infolist): Infolist
                     );
                 }),
         ])
+        
             ->columns([
+                Tables\Columns\TextColumn::make('documento_identidad')
+                ->label('Documento')
+                ->searchable()
+                ->sortable()
+                ->toggleable(isToggledHiddenByDefault: true),
+
                 Tables\Columns\TextColumn::make('estudiante_nombre')
                     ->label('Postulante')
-                    ->searchable()
+                    ->searchable(['estudiante_nombre', 'estudiante_email', 'documento_identidad'])
                     ->sortable(),
 
                 Tables\Columns\TextColumn::make('estudiante_email')
@@ -806,6 +814,11 @@ public static function infolist(Infolist $infolist): Infolist
             ]);
     }
 
+    public static function getGloballySearchableAttributes(): array
+    {
+        return ['estudiante_nombre', 'estudiante_email', 'documento_identidad'];
+    }
+    
     public static function getRelations(): array
     {
         return [];

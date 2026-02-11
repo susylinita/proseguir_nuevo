@@ -63,6 +63,6 @@ class Settings extends Page
     public static function canAccess(): bool
     {
         // Solo coordinación/gerencia
-        return auth()->user()?->hasAnyRole(['coordinador', 'gerente']) ?? false;
+        return auth()->user()?->hasRole(['admin']) ?? false;
     }
 }

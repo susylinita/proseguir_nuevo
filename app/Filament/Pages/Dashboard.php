@@ -31,4 +31,9 @@ class Dashboard extends BaseDashboard
     {
         return 12;
     }
+
+    public function getColumns(): int | string |array
+    {
+        return 1;
+    }
 }

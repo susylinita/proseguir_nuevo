@@ -36,7 +36,7 @@ class PostulacionResource extends Resource
 
     public static function canCreate(): bool
     {
-        return auth()->user()?->hasRole('admin_panel') ?? false;
+        return auth()->user()?->hasRole('admin') ?? false;
     }
 
     public static function canEdit($record): bool
@@ -48,7 +48,7 @@ class PostulacionResource extends Resource
             return false;
         }
 
-        return auth()->user()?->hasRole('admin_panel') ?? false;
+        return auth()->user()?->hasRole('admin') ?? false;
     }
 
     public static function canDelete($record): bool
@@ -56,7 +56,7 @@ class PostulacionResource extends Resource
         $user = auth()->user();
         if (! $user) return false;
 
-        return auth()->user()?->hasRole('admin_panel') ?? false;
+        return auth()->user()?->hasRole('admin') ?? false;
     }
 
     public static function form(Form $form): Form
@@ -268,7 +268,7 @@ class PostulacionResource extends Resource
                         $user = auth()->user();
 
                         // ✅ Nuevo: Admin (o is_admin)
-                        if (($user->is_admin ?? false) || $user?->hasRole('admin')) {
+                        if ($user?->hasRole('admin')) {
                             return [
                                 'Pendiente' => 'Pendiente',
                                 'Entrevista' => 'Entrevista',
@@ -771,7 +771,7 @@ public static function infolist(Infolist $infolist): Infolist
                     ->color('info')
                     ->requiresConfirmation()
                     ->visible(fn ($record) =>
-                        auth()->user()?->hasRole('admin_panel') &&
+                        auth()->user()?->hasRole('admin') &&
                         $record->estado === 'Pendiente'
                     )
                     ->action(function ($record) {
@@ -796,7 +796,7 @@ public static function infolist(Infolist $infolist): Infolist
                         $user = auth()->user();
                         if (! $record) return false;
 
-                        return $user?->hasRole('admin_panel')
+                        return $user?->hasRole('admin')
                             && in_array($record->estado, ['Entrevista', 'Aprobado'], true);
                     })
                     ->disabled(fn ($record) => ! $record || $record->estado !== 'Entrevista')
@@ -820,7 +820,7 @@ public static function infolist(Infolist $infolist): Infolist
                     ->color('danger')
                     ->requiresConfirmation()
                     ->visible(fn ($record) =>
-                        auth()->user()?->hasRole('admin_panel') &&
+                        auth()->user()?->hasRole('admin') &&
                         ! in_array($record->estado, ['Aprobado', 'Rechazado'], true)
                     )
                     ->action(function ($record) {

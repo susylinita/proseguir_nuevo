@@ -17,6 +17,14 @@ class PostulacionController extends Controller
 
     public function store(Request $request)
 {
+    $user = auth()->user();
+
+if ($user->becas_bloqueado) {
+    return back()->withErrors([
+        'general' => 'Tu usuario está bloqueado para solicitar becas. Motivo: ' . ($user->becas_bloqueado_motivo ?? 'No especificado'),
+    ]);
+}
+
     
     $baseRules = [
         'tipo_postulacion' => ['required', 'in:primer_semestre,otro_semestre,renovacion'],

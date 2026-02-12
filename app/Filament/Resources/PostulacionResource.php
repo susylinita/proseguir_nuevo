@@ -305,7 +305,7 @@ class PostulacionResource extends Resource
                     ->label('Perfil descriptivo (coordinación)')
                     ->rows(4)
                     ->maxLength(5000)
-                    ->disabled(fn () => ! (auth()->user()?->hasAnyRole(['coordinador','gerente']) ?? false)),
+                    ->disabled(fn () => ! (auth()->user()?->hasRole(['admin']) ?? false)),
 
                 // ✅ Entrevista (interno) - SOLO ADMIN - NO visible para estudiantes
                 Forms\Components\Textarea::make('observaciones_entrevista')
@@ -324,7 +324,7 @@ class PostulacionResource extends Resource
 
                         $puede = ($user->is_admin ?? false) || $user?->hasRole('admin') || $user?->hasRole('gerente');
 
-                        return $puede && $record->estado === 'Entrevista';
+                        return $puede && $record && $record->estado === 'Entrevista';
                     })
 
 
@@ -653,7 +653,7 @@ public static function infolist(Infolist $infolist): Infolist
             ])
             ->visible(function ($record) {
                 $user = auth()->user();
-                if (! $user?->hasAnyRole(['coordinador', 'gerente'])) return false;
+                if (! $user?->hasRole(['admin'])) return false;
 
                 if (! $record) return false;
                 return in_array($record->estado, ['Entrevista', 'Aprobado'], true);
@@ -724,6 +724,8 @@ public static function infolist(Infolist $infolist): Infolist
 
                 Tables\Columns\TextColumn::make('estudiante_nombre')
                     ->label('Postulante')
+                    ->limit(40)
+                    ->tooltip(fn ($record) => $record->estudiante_nombre) // muestra completo al pasar mouse
                     ->searchable(['estudiante_nombre', 'estudiante_email', 'documento_identidad'])
                     ->sortable(),
 
@@ -776,9 +778,9 @@ public static function infolist(Infolist $infolist): Infolist
                     )
                     ->action(function ($record) {
                         $record->update([
-                            'estado' => 'Entrevista',
-                            'estado_actualizado_por' => auth()->id(),
-                            'estado_actualizado_en' => now(),
+                            'estado' => 'Aprobado',
+                            'aprobado_por' => auth()->id(),
+                            'fecha_aprobacion' => now(),
                         ]);
 
                         Notification::make()

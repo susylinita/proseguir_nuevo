@@ -3,10 +3,11 @@
 namespace App\Filament\Resources\KitEscolarResource\Pages;
 
 use App\Filament\Resources\KitEscolarResource;
-use App\Models\KitEscolar; // Importa el modelo
+use App\Models\KitRegistro;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
-use Barryvdh\DomPDF\Facade\Pdf; // Importa el generador de PDF
+use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class ListKitEscolars extends ListRecords
 {
@@ -16,24 +17,29 @@ class ListKitEscolars extends ListRecords
     {
         return [
             Actions\CreateAction::make(),
-            
-            // BOTÓN DE DESCARGAR REPORTE
+
             Actions\Action::make('descargarReporte')
                 ->label('Descargar PDF')
                 ->color('danger')
                 ->icon('heroicon-o-document-arrow-down')
                 ->action(function () {
-                    $kits = KitEscolar::all(); // Trae a todos los estudiantes
-                    
-                    $pdf = Pdf::loadView('pdf.reporte-kits', [
-                        'kits' => $kits,
-                        'fecha' => now()->format('d/m/Y')
-                    ]);
 
-                    return response()->streamDownload(function () use ($pdf) {
-                        echo $pdf->stream();
-                    }, 'reporte-kits-' . now()->format('Y-m-d') . '.pdf');
+                    $kits = KitRegistro::with('aprobador')->get();
+
+                    $titulo = 'Reporte General - Kits Escolares';
+                    $fecha = Carbon::now();
+
+                    $pdf = Pdf::loadView(
+                        'pdf.reporte-kits',
+                        compact('kits', 'titulo', 'fecha')
+                    )->setPaper('a4', 'landscape');
+
+                    return response()->streamDownload(
+                        fn () => print($pdf->output()),
+                        'kits_general_' . now()->format('Ymd_His') . '.pdf'
+                    );
                 }),
+
         ];
     }
 }

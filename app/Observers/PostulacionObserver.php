@@ -23,7 +23,7 @@ class PostulacionObserver
         ]);
 
         // Avisar a coordinadores (y/o gerente) por email
-        $admins = User::role('coordinador')->get()->merge(User::role('gerente')->get());
+        $admins = User::role('admin')->get();
 
         foreach ($admins as $admin) {
             $admin->notify(new NuevaPostulacionCreada($postulacion));
@@ -45,8 +45,8 @@ class PostulacionObserver
         $postulacion->estado_actualizado_en = now();
 
         // Fechas de aprobación/rechazo
-        if ($estadoNuevo === 'Aprobado' && $postulacion->aprobado_en === null) {
-            $postulacion->aprobado_en = now();
+        if ($estadoNuevo === 'Aprobado' && $postulacion->fecha_aprobacion === null) {
+            $postulacion->fecha_aprobacion = now();
         }
 
         if ($estadoNuevo === 'Rechazado' && $postulacion->rechazado_en === null) {

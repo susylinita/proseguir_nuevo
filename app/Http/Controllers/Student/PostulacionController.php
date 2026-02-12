@@ -51,7 +51,7 @@ if ($user->becas_bloqueado) {
 
         // anexos generales (pdf/jpg/png)
         'anexo_doc_identidad' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
-        'anexo_foto_documento' => ['required', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png'],
+        $request->validate(['anexo_foto_documento' => ['required', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png']]),
         'anexo_certificado_bancario' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
 
         'promedio_carrera' => ['nullable', 'numeric', 'min:0', 'max:5'],

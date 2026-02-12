@@ -2,12 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Forzar Filament login a ocupar todo el ancho */
-.fi-simple-layout .fi-simple-main,
-.fi-simple-layout .fi-simple-page,
-.fi-simple-layout .fi-simple-card,
-.fi-simple-layout .fi-page,
-.fi-simple-layout .fi-section {
-    max-width: 100% !important;
-    width: 100% !important;
+/* ===============================
+   🎨 ESTILO INSTITUCIONAL FRONTEND
+   =============================== */
+
+@layer components {
+
+  /* ===== Layout base ===== */
+  .page-shell {
+    @apply min-h-screen bg-slate-100;
+  }
+
+  .page-wrap {
+    @apply max-w-6xl mx-auto px-6 py-10;
+  }
+
+  /* ===== Card institucional ===== */
+  .card {
+    @apply bg-white rounded-2xl border border-slate-200 shadow-sm;
+  }
+
+  .card-header {
+    @apply px-6 py-4 border-b border-slate-200 flex justify-between items-center;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  /* ===== Títulos ===== */
+  .title-main {
+    @apply text-2xl font-semibold text-slate-900;
+  }
+
+  .section-title {
+    @apply text-xs font-semibold tracking-widest uppercase text-slate-500;
+  }
+
+  .text-muted {
+    @apply text-sm text-slate-600;
+  }
+
+  /* ===== Formularios ===== */
+  .form-label {
+    @apply block text-sm font-medium text-slate-700;
+  }
+
+  .form-input {
+    @apply mt-1 w-full rounded-lg border-slate-300 shadow-sm focus:border-blue-700 focus:ring-blue-700;
+  }
+
+  .form-help {
+    @apply mt-2 text-xs text-slate-500;
+  }
+
+  /* ===== Botones ===== */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition;
+  }
+
+  .btn-primary {
+    @apply btn bg-blue-800 text-white hover:bg-blue-900;
+  }
+
+  .btn-outline {
+    @apply btn border border-slate-300 bg-white text-slate-800 hover:bg-slate-50;
+  }
+
 }

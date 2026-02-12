@@ -24,7 +24,7 @@ class ViewPostulacion extends ViewRecord
                 ->visible(function () {
                     $user = auth()->user();
 
-                    return $user?->hasAnyRole(['coordinador', 'gerente'])
+                    return $user?->hasAnyRole(['admin'])
                         && ($this->record?->estado === 'Entrevista');
                 })
                 ->modalHeading('Observaciones de la entrevista')

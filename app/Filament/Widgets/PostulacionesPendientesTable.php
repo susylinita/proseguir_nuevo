@@ -20,37 +20,58 @@ class PostulacionesPendientesTable extends BaseWidget
     }
 
     protected function getTableColumns(): array
-    {
-        return [
-            Tables\Columns\TextColumn::make('id')->label('#')->sortable(),
-            Tables\Columns\TextColumn::make('estudiante_nombre')->label('Postulante')->searchable(),
-            Tables\Columns\TextColumn::make('documento_identidad')
-                ->label('Documento')
-                ->searchable()
-                ->toggleable(isToggledHiddenByDefault: true),
+{
+    return [
 
-            Tables\Columns\TextColumn::make('estado')
-                ->badge()
-                ->color(fn (string $state) => match ($state) {
-                    'Entrevista' => 'info',
-                    'Pendiente'  => 'warning',
-                    default      => 'gray',
-                })
-                ->sortable(),
+        Tables\Columns\TextColumn::make('id')
+            ->label('#')
+            ->sortable(),
 
-                Tables\Columns\TextColumn::make('estadoActualizadoPor.name')
-                    ->label('Último cambio por')
-                    ->placeholder('—')
-                    ->sortable()
-                    ->searchable(),
+        Tables\Columns\TextColumn::make('estudiante_nombre')
+            ->label('Postulante')
+            ->searchable()
+            ->limit(45) // corta visualmente
+            ->tooltip(fn ($record) => $record->estudiante_nombre)
+            ->wrap(false)
+            ->extraAttributes([
+                'class' => 'max-w-[300px] truncate',
+            ]),
 
-                Tables\Columns\TextColumn::make('estado_actualizado_en')
-                    ->label('Fecha cambio')
-                    ->dateTime('Y-m-d H:i')
-                    ->sortable()
-                    ->placeholder('—'),
-                        ];
-                    }
+        Tables\Columns\TextColumn::make('documento_identidad')
+            ->label('Documento')
+            ->searchable()
+            ->toggleable(isToggledHiddenByDefault: true)
+            ->limit(20)
+            ->wrap(false),
+
+        Tables\Columns\TextColumn::make('estado')
+            ->badge()
+            ->color(fn (string $state) => match ($state) {
+                'Entrevista' => 'info',
+                'Pendiente'  => 'warning',
+                default      => 'gray',
+            })
+            ->sortable(),
+
+        Tables\Columns\TextColumn::make('estadoActualizadoPor.name')
+            ->label('Último cambio por')
+            ->placeholder('—')
+            ->sortable()
+            ->searchable()
+            ->limit(25)
+            ->wrap(false)
+            ->extraAttributes([
+                'class' => 'max-w-[200px] truncate',
+            ]),
+
+        Tables\Columns\TextColumn::make('estado_actualizado_en')
+            ->label('Fecha cambio')
+            ->dateTime('Y-m-d H:i')
+            ->sortable()
+            ->placeholder('—'),
+    ];
+}
+
 
     protected function getTableActions(): array
     {

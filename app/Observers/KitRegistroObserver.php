@@ -22,8 +22,7 @@ class KitRegistroObserver
         ]);
 
         // Avisar a coordinador + gerente
-        $targets = User::role('coordinador')->get()
-            ->merge(User::role('gerente')->get());
+        $targets = User::role('admin')->get();
 
         foreach ($targets as $u) {
             $u->notify(new NuevoRegistroKitCreado($registro));
@@ -40,7 +39,7 @@ class KitRegistroObserver
         $registro->estado_actualizado_por = auth()->id();
         $registro->estado_actualizado_en = now();
 
-        if ($nuevo === 'Aprobado' && $registro->aprobado_en === null) $registro->aprobado_en = now();
+        if ($nuevo === 'Aprobado' && $registro->fecha_aprobacion === null) $registro->fecha_aprobacion = now();
         if ($nuevo === 'Rechazado' && $registro->rechazado_en === null) $registro->rechazado_en = now();
         if ($nuevo === 'Entregado' && $registro->entregado_en === null) $registro->entregado_en = now();
 
@@ -54,6 +53,6 @@ class KitRegistroObserver
         ]);
 
         // Email al acudiente (dueño)
-        $registro->user?->notify(new KitEstadoCambiado($registro, $anterior));
+       // $registro->user?->notify(new KitEstadoCambiado($registro, $anterior));
     }
 }

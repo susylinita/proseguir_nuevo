@@ -10,27 +10,21 @@ class KitRegistro extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id',
-        'nino_nombre',
-        'nino_documento',
-        'nino_fecha_nacimiento',
-        'institucion',
-        'grado',
-        'estado',
-        'observaciones',
-        'pdf_documento',
-        'pdf_certificado',
-        'aprobado_en',
-        'rechazado_en',
-        'entregado_en',
-    ];
+    'user_id',
+    'colaborador_nombre',
+    'colaborador_documento',
+    'linea_negocio',
+    'area',
+    'nino_nombre',
+    'nino_documento',
+    'edad',
+    'grado',
+    'institucion',
+    'estado',
+    'observaciones'
+];
 
-    protected $casts = [
-        'nino_fecha_nacimiento' => 'date',
-        'aprobado_en' => 'datetime',
-        'rechazado_en' => 'datetime',
-        'entregado_en' => 'datetime',
-    ];
+
 
     public function user()
     {
@@ -40,5 +34,10 @@ class KitRegistro extends Model
     public function historicoEstados()
     {
         return $this->hasMany(KitEstadoHistoria::class);
+    }
+
+    public function aprobador()
+    {
+        return $this->belongsTo(User::class, 'aprobado_por');
     }
 }

@@ -1,32 +1,63 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+    <div class="rounded-2xl p-8 
+                bg-gradient-to-r from-slate-100 via-slate-200 to-blue-100 
+                border border-slate-200 shadow-sm">
+
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+
+            {{-- Lado izquierdo --}}
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+
+                <div class="inline-flex items-center gap-2 
+                            px-4 py-1.5 rounded-full 
+                            bg-white/70 backdrop-blur 
+                            border border-slate-300 
+                            text-xs font-medium text-slate-700 shadow-sm">
+                    📄 Gestión de solicitudes
+                </div>
+
+                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
                     Mis postulaciones
-                </h2>
-                <p class="text-sm text-gray-500 mt-1">
-                    Aquí puedes ver el estado de tus postulaciones y gestionar tus documentos.
+                </h1>
+
+                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
+                    Consulta el estado de tus solicitudes, revisa avances y administra tus documentos adjuntos.
                 </p>
+
             </div>
 
-            <div class="flex items-center gap-3">
+            {{-- Botones derecha --}}
+            <div class="flex flex-wrap items-center gap-4">
+
                 <a href="{{ route('student.postulaciones.create') }}"
-                   class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
-                    Nueva postulación
+                   class="inline-flex items-center gap-2 
+                          bg-slate-900 text-white 
+                          px-6 py-3 rounded-xl 
+                          font-medium shadow-sm 
+                          hover:bg-slate-800 transition">
+                    + Nueva postulación
                 </a>
 
-                <a href="{{ route('student.dashboard') }}" 
-                class="text-sm text-gray-600 hover:text-gray-900">
-                    Volver al dashboard
+                <a href="{{ route('student.dashboard') }}"
+                   class="inline-flex items-center gap-2 
+                          bg-white border border-slate-300 
+                          text-slate-700 px-6 py-3 
+                          rounded-xl font-medium 
+                          hover:bg-slate-50 transition">
+                    ← Volver al dashboard
                 </a>
+
             </div>
+
         </div>
-    </x-slot>
+    </div>
+</x-slot>
+
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+            <div class="bg-white border border-slate-200 shadow-sm rounded-2xl overflow-hidden">
                 <div class="p-6 text-gray-900">
 
                     @if ($postulaciones->isEmpty())
@@ -35,8 +66,8 @@
                         </div>
                     @else
                         <div class="overflow-x-auto">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full text-sm">
+                                <thead class="bg-slate-50">
                                     <tr>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tipo</th>
@@ -75,19 +106,20 @@
                                             };
                                         @endphp
 
-                                        <tr class="hover:bg-gray-50">
+                                        <tr class="hover:bg-slate-50 transition">
                                             <td class="px-4 py-3 text-sm text-gray-900">
                                                 #{{ $postulacion->id }}
                                             </td>
 
                                             <td class="px-4 py-3 text-sm">
-                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ $tipoBadge }}">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $tipoBadge }}">
+
                                                     {{ $tipoLabel }}
                                                 </span>
                                             </td>
 
                                             <td class="px-4 py-3 text-sm">
-                                                <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium {{ $estadoBadge }}">
+                                                <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold {{ $estadoBadge }}">
                                                     {{ $estado }}
                                                 </span>
                                             </td>
@@ -96,19 +128,35 @@
                                                 {{ optional($postulacion->updated_at)->format('Y-m-d H:i') }}
                                             </td>
 
-                                            <td class="px-4 py-3 text-sm text-right space-x-3">
-                                                <a href="{{ route('student.postulaciones.show', $postulacion) }}"
-                                                   class="text-indigo-600 hover:text-indigo-900">
-                                                    Ver
-                                                </a>
+                                            <td class="px-4 py-3 text-sm text-right">
+                                                <div class="flex justify-end gap-2">
 
-                                                @if ($estado === 'Pendiente')
-                                                    <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
-                                                       class="text-gray-700 hover:text-gray-900">
-                                                        Editar
+                                                    {{-- Botón Ver --}}
+                                                    <a href="{{ route('student.postulaciones.show', $postulacion) }}"
+                                                    class="inline-flex items-center gap-1 
+                                                            px-3 py-1.5 rounded-lg 
+                                                            text-xs font-medium
+                                                            bg-slate-100 text-slate-700 
+                                                            border border-slate-200
+                                                            hover:bg-slate-200 transition">
+                                                        👁 Ver
                                                     </a>
-                                                @endif
+
+                                                    {{-- Botón Editar --}}
+                                                    @if ($estado === 'Pendiente')
+                                                        <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
+                                                        class="inline-flex items-center gap-1 
+                                                                px-3 py-1.5 rounded-lg 
+                                                                text-xs font-medium
+                                                                bg-slate-900 text-white 
+                                                                hover:bg-slate-800 transition">
+                                                            ✏ Editar
+                                                        </a>
+                                                    @endif
+
+                                                </div>
                                             </td>
+
                                         </tr>
                                     @endforeach
                                 </tbody>

@@ -1,129 +1,198 @@
 <x-app-kits-layout>
+
+    {{-- ================= HEADER ================= --}}
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Registro de Kit – {{ $registro->nino_nombre }}
-            </h2>
+        <div class="rounded-2xl p-8 
+                    bg-gradient-to-r from-slate-100 via-slate-200 to-emerald-100 
+                    border border-slate-200 shadow-sm">
 
-            <div class="flex items-center gap-3">
-                <a href="{{ route('kits.registros.index') }}" class="text-sm text-gray-600 hover:text-gray-900">
-                    Volver a mis registros
-                </a>
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-                @if (!in_array($registro->estado, ['Aprobado','Rechazado','Entregado']))
-                    <a href="{{ route('kits.registros.edit', $registro) }}"
-                       class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
-                        Editar
+                <div>
+                    <div class="inline-flex items-center gap-2 
+                                px-4 py-1.5 rounded-full 
+                                bg-white/70 backdrop-blur 
+                                border border-slate-300 
+                                text-xs font-medium text-slate-700 shadow-sm">
+                        📄 Detalle del registro
+                    </div>
+
+                    <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
+                        Solicitud de Kit Escolar
+                    </h1>
+
+                    <p class="mt-3 text-slate-600 max-w-2xl">
+                        Información completa del registro realizado.
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <a href="{{ route('kits.dashboard') }}"
+                       class="inline-flex items-center gap-2 
+                              bg-white border border-slate-300 
+                              text-slate-700 px-6 py-3 
+                              rounded-xl font-medium 
+                              hover:bg-slate-50 transition">
+                        ← Volver al dashboard
                     </a>
-                @endif
+                </div>
+
             </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
 
-            @if (session('status'))
-                <div class="rounded-md bg-green-50 p-4 text-sm text-green-700">
-                    {{ session('status') }}
-                </div>
-            @endif
+    {{-- ================= CONTENIDO ================= --}}
+    <div class="py-10">
+        <div class="max-w-5xl mx-auto px-6">
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 space-y-5">
+            <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Estado</div>
-                            <div class="mt-1 text-sm font-medium text-gray-900">{{ $registro->estado }}</div>
+                {{-- Línea superior --}}
+                <div class="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-indigo-700 via-slate-900 to-emerald-500"></div>
+
+                <div class="p-10 space-y-10 text-slate-900">
+
+                    {{-- ================= ESTADO ================= --}}
+                    @php
+                        $color = match($registro->estado) {
+                            'Aprobado' => 'bg-green-100 text-green-800',
+                            'Rechazado' => 'bg-red-100 text-red-800',
+                            'Entregado' => 'bg-blue-100 text-blue-800',
+                            default => 'bg-yellow-100 text-yellow-800',
+                        };
+                    @endphp
+
+                    <div class="flex justify-between items-center border-b border-slate-200 pb-6">
+                        <div>
+                            <p class="text-sm text-slate-500">Estado actual</p>
+                            <span class="inline-flex px-3 py-1 mt-2 rounded-full text-xs font-semibold {{ $color }}">
+                                {{ $registro->estado }}
+                            </span>
                         </div>
 
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Última actualización</div>
-                            <div class="mt-1 text-sm font-medium text-gray-900">
-                                {{ optional($registro->updated_at)->format('Y-m-d H:i') }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Datos del niño</div>
-
-                        <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                            <div>
-                                <div class="text-gray-500">Nombre</div>
-                                <div class="font-medium text-gray-900">{{ $registro->nino_nombre }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-gray-500">Documento</div>
-                                <div class="font-medium text-gray-900">{{ $registro->nino_documento ?? 'N/D' }}</div>
-                            </div>
-
-                            <div>
-                                <div class="text-gray-500">Fecha nacimiento</div>
-                                <div class="font-medium text-gray-900">
-                                    {{ $registro->nino_fecha_nacimiento?->format('Y-m-d') ?? 'N/D' }}
-                                </div>
-                            </div>
-
-                            <div>
-                                <div class="text-gray-500">Institución / Grado</div>
-                                <div class="font-medium text-gray-900">
-                                    {{ $registro->institucion ?? 'N/D' }}{{ $registro->grado ? ' – '.$registro->grado : '' }}
-                                </div>
-                            </div>
+                        <div class="text-right text-sm text-slate-500">
+                            Creado: {{ $registro->created_at->format('d/m/Y H:i') }}
                         </div>
                     </div>
 
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Observaciones</div>
-                        <div class="mt-2 text-sm text-gray-800 whitespace-pre-line">
-                            {{ $registro->observaciones ?? 'Sin observaciones.' }}
+
+                    {{-- ================= COLABORADOR ================= --}}
+                    <div class="space-y-6">
+                        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                            Información del colaborador
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+                            <div>
+                                <p class="text-slate-500">Nombre completo</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->colaborador_nombre }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-slate-500">Documento</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->colaborador_documento }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-slate-500">Línea de negocio</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->linea_negocio }}
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-slate-500">Área</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->area }}
+                                </p>
+                            </div>
+
                         </div>
                     </div>
 
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Documentos</div>
 
-                        <div class="mt-3 space-y-3 text-sm">
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <div class="font-medium text-gray-900">Documento del niño</div>
-                                    <div class="text-gray-500">
-                                        {{ $registro->pdf_documento ? basename($registro->pdf_documento) : 'No adjuntado' }}
-                                    </div>
-                                </div>
+                    {{-- ================= NIÑO ================= --}}
+                    <div class="space-y-6 pt-6 border-t border-slate-200">
+                        <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                            Información del niño
+                        </h3>
 
-                                @if ($registro->pdf_documento)
-                                    <a href="{{ route('kits.archivos.documento', $registro) }}"
-                                    target="_blank"
-                                    class="text-indigo-600 hover:text-indigo-900">
-                                        Ver / Descargar
-                                    </a>
-                                @endif
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+
+                            <div>
+                                <p class="text-slate-500">Nombre completo</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->nino_nombre }}
+                                </p>
                             </div>
 
-                            <div class="flex items-center justify-between gap-4">
-                                <div>
-                                    <div class="font-medium text-gray-900">Certificado / soporte</div>
-                                    <div class="text-gray-500">
-                                        {{ $registro->pdf_certificado ? basename($registro->pdf_certificado) : 'No adjuntado' }}
-                                    </div>
-                                </div>
+                            <div>
+                                <p class="text-slate-500">Documento</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->nino_documento }}
+                                </p>
+                            </div>
 
-                                @if ($registro->pdf_certificado)
-                                    <a href="{{ route('kits.archivos.certificado', $registro) }}"
-                                    target="_blank">
-                                        Ver / Descargar
-                                    </a>
-                                @endif
+                            <div>
+                                <p class="text-slate-500">Edad</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->edad }} años
+                                </p>
+                            </div>
+
+                            <div>
+                                <p class="text-slate-500">Grado</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->grado }}
+                                </p>
+                            </div>
+
+                            <div class="md:col-span-2">
+                                <p class="text-slate-500">Institución</p>
+                                <p class="font-medium text-slate-900 mt-1">
+                                    {{ $registro->institucion }}
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    {{-- ================= OBSERVACIONES ================= --}}
+                    @if($registro->observaciones)
+                        <div class="space-y-3 pt-6 border-t border-slate-200">
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                                Observaciones
+                            </h3>
+
+                            <div class="rounded-xl bg-slate-50 border border-slate-200 p-5 text-sm text-slate-700 whitespace-pre-line">
+                                {{ $registro->observaciones }}
                             </div>
                         </div>
+                    @endif
 
-                        <p class="mt-4 text-xs text-gray-500">
-                            * Si los enlaces no abren, asegúrate de haber ejecutado: <code>php artisan storage:link</code>
-                        </p>
+
+                    {{-- ================= BOTONES ================= --}}
+                    <div class="flex justify-end gap-4 pt-8 border-t border-slate-200">
+
+                        @if($registro->estado === 'Pendiente')
+                            <a href="{{ route('kits.registros.edit', $registro) }}"
+                               class="inline-flex items-center rounded-xl bg-indigo-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-indigo-500 transition shadow-sm">
+                                Editar registro
+                            </a>
+                        @endif
+
+                        <a href="{{ route('kits.dashboard') }}"
+                           class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                            Volver
+                        </a>
+
                     </div>
 
                 </div>
@@ -131,4 +200,5 @@
 
         </div>
     </div>
-</x-app-layout>
+
+</x-app-kits-layout>

@@ -1,17 +1,5 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="font-semibold text-xl text-slate-900 leading-tight">
-                    Mi portal · Becas
-                </h2>
-                <p class="mt-1 text-sm text-slate-500">
-                    Consulta tus postulaciones, adjunta documentos y haz seguimiento al estado.
-                </p>
-            </div>
-
-        </div>
-    </x-slot>
+   
 
     {{-- micro-animaciones sin librerías --}}
     <style>
@@ -30,8 +18,8 @@
         }
     </style>
 
-    <div class="py-10">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-6">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-5">
 
             @if (session('status'))
                 <div class="reveal rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">

@@ -1,19 +1,59 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Crear postulación
-            </h2>
+    <div class="rounded-2xl p-8 
+                bg-gradient-to-r from-slate-100 via-slate-200 to-blue-100 
+                border border-slate-200 shadow-sm">
 
-            <a href="{{ route('student.postulaciones.index') }}"
-               class="text-sm text-gray-600 hover:text-gray-900">
-                Volver a mis postulaciones
-            </a>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+
+            {{-- Lado izquierdo --}}
+            <div>
+
+                {{-- Badge --}}
+                <div class="inline-flex items-center gap-2 
+                            px-4 py-1.5 rounded-full 
+                            bg-white/70 backdrop-blur 
+                            border border-slate-300 
+                            text-xs font-medium text-slate-700 shadow-sm">
+                    ✍️ Nueva solicitud
+                </div>
+
+                {{-- Título --}}
+                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
+                    Crear postulación
+                </h1>
+
+                {{-- Descripción --}}
+                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
+                    Completa cuidadosamente la información requerida para enviar tu solicitud
+                    a revisión de coordinación y gerencia.
+                </p>
+
+                <p class="mt-3 text-sm text-slate-500">
+                    Asegúrate de adjuntar todos los documentos obligatorios.
+                </p>
+            </div>
+
+            {{-- Botón derecha --}}
+            <div class="flex items-center gap-4">
+
+                <a href="{{ route('student.postulaciones.index') }}"
+                   class="inline-flex items-center gap-2 
+                          bg-white border border-slate-300 
+                          text-slate-700 px-6 py-3 
+                          rounded-xl font-medium 
+                          hover:bg-slate-50 transition">
+                    ← Volver a mis postulaciones
+                </a>
+
+            </div>
+
         </div>
-    </x-slot>
+    </div>
+</x-slot>
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+
+    <div class="max-w-5xl mx-auto py-10 px-6">
 
             @if ($errors->any())
                 <div class="rounded-md bg-red-50 p-4">
@@ -26,8 +66,8 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900"
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="p-8 text-slate-900"
                      x-data="{
                         tipo: '{{ old('tipo_postulacion', 'primer_semestre') }}',
                         cuentaActualizada: {{ old('cuenta_actualizada', 0) ? 'true' : 'false' }}
@@ -342,8 +382,11 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Foto tipo documento (fondo blanco)</label>
-                                    <input name="anexo_foto_documento" type="file" accept=".jpg,.jpeg,.png,image/*"
-                                           class="mt-1 block w-full text-sm text-gray-700">
+                                    <input name="anexo_foto_documento"
+                                type="file"
+                                accept=".jpg,.jpeg,.png,image/*"
+                                required
+                                class="mt-1 block w-full text-sm text-gray-700">
                                     <p class="mt-1 text-xs text-gray-500">Esta foto la ve gerencia.</p>
                                 </div>
                             </div>
@@ -381,18 +424,18 @@
                             </div>
                         </div>
 
-                        {{-- Botones --}}
-                        <div class="flex justify-end gap-3">
-                            <a href="{{ route('student.postulaciones.index') }}"
-                               class="rounded-md border px-4 py-2 text-sm">
-                                Cancelar
-                            </a>
+                        {{-- BOTONES --}}
+                    <div class="flex justify-end gap-4 pt-4 border-t border-slate-200">
+                        <a href="{{ route('student.postulaciones.index') }}"
+                           class="px-6 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                            Cancelar
+                        </a>
 
-                            <button type="submit"
-                                    class="rounded-md bg-gray-900 px-4 py-2 text-sm text-white">
-                                Crear postulación
-                            </button>
-                        </div>
+                        <button type="submit"
+                                class="px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-black transition shadow-sm">
+                            Crear postulación
+                        </button>
+                    </div>
 
                     </form>
 

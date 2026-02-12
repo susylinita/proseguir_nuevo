@@ -55,7 +55,7 @@ Route::middleware('auth')->get('/redirect-portal', function () {
 Route::get('/dashboard', function () {
     $user = auth()->user();
 
-    if (($user->is_admin ?? false) || $user->hasRole(['gerente','coordinador'])) {
+    if (($user->is_admin ?? false) || $user->hasRole(['admin'])) {
         return redirect('/admin');
     }
 

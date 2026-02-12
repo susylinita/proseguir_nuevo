@@ -1,8 +1,6 @@
 @import '../../../../vendor/filament/filament/resources/css/theme.css';
+@config "../../../../tailwind.config.js";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
 /* Tus estilos premium */
 .fi-body {
@@ -20,7 +18,7 @@
 .fi-ta-content,
 .fi-fo-component-ctn {
   border-radius: 0 !important;
-  box-shadow: 0 8px 20px -12px rgba(15, 23, 42, 0.25) !important;
+  box-shadow: 0 20px 35px -30px rgba(15, 23, 42, 0.25) !important;
   overflow: hidden;
 }
 

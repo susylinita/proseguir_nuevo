@@ -1,116 +1,200 @@
 <x-app-kits-layout>
-    <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Registrar niño – Kits Escolares
-            </h2>
+   <x-slot name="header">
+    <div class="rounded-2xl p-8 
+                bg-gradient-to-r from-slate-100 via-slate-200 to-emerald-100 
+                border border-slate-200 shadow-sm">
 
-            <a href="{{ route('kits.dashboard') }}" class="text-sm text-gray-600 hover:text-gray-900">
-                Volver al dashboard
-            </a>
-        </div>
-    </x-slot>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+            {{-- Lado izquierdo --}}
+            <div>
 
-            @if ($errors->any())
-                <div class="rounded-md bg-red-50 p-4">
-                    <div class="text-sm font-semibold text-red-800">Revisa los campos:</div>
-                    <ul class="mt-2 list-disc list-inside text-sm text-red-700">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                {{-- Badge --}}
+                <div class="inline-flex items-center gap-2 
+                            px-4 py-1.5 rounded-full 
+                            bg-white/70 backdrop-blur 
+                            border border-slate-300 
+                            text-xs font-medium text-slate-700 shadow-sm">
+                    🎒 Nueva solicitud de kit
                 </div>
-            @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
+                {{-- Título --}}
+                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
+                    Registro Kits Escolares
+                </h1>
 
-                    <form method="POST"
-                          action="{{ route('kits.registros.store') }}"
-                          enctype="multipart/form-data">
+                {{-- Descripción --}}
+                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
+                    Diligencia la información del colaborador y del niño beneficiario
+                    para solicitar el kit escolar correspondiente.
+                </p>
+
+                <p class="mt-3 text-sm text-slate-500">
+                    Puedes registrar más de un kit si tienes varios niños beneficiarios.
+                </p>
+            </div>
+
+            {{-- Botón derecha --}}
+            <div class="flex items-center gap-4">
+
+                <a href="{{ route('kits.dashboard') }}"
+                   class="inline-flex items-center gap-2 
+                          bg-white border border-slate-300 
+                          text-slate-700 px-6 py-3 
+                          rounded-xl font-medium 
+                          hover:bg-slate-50 transition">
+                    ← Volver al dashboard
+                </a>
+
+            </div>
+
+        </div>
+    </div>
+</x-slot>
+
+
+
+    <div class="py-10">
+        <div class="max-w-5xl mx-auto px-6">
+
+            <div class="relative overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+
+                <div class="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-indigo-700 via-slate-900 to-emerald-500"></div>
+
+                <div class="p-10 space-y-10 text-slate-900">
+
+                    @if ($errors->any())
+                        <div class="rounded-xl border border-red-200 bg-red-50 p-6">
+                            <div class="text-sm font-semibold text-red-800">
+                                Revisa los siguientes campos:
+                            </div>
+                            <ul class="mt-3 list-disc list-inside text-sm text-red-700 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <form method="POST" action="{{ route('kits.registros.store') }}">
                         @csrf
 
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {{-- ========================= --}}
+                        {{-- DATOS DEL COLABORADOR --}}
+                        {{-- ========================= --}}
+                        <div class="space-y-6">
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                                Información del colaborador
+                            </h3>
 
-                            <div class="sm:col-span-2">
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Nombre completo del niño
-                                </label>
-                                <input name="nino_nombre" type="text"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       value="{{ old('nino_nombre') }}" required>
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Documento (opcional)
-                                </label>
-                                <input name="nino_documento" type="text"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       value="{{ old('nino_documento') }}">
-                            </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Nombre completo
+                                    </label>
+                                    <input name="colaborador_nombre" type="text" required
+                                           value="{{ old('colaborador_nombre') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Fecha de nacimiento (opcional)
-                                </label>
-                                <input name="nino_fecha_nacimiento" type="date"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       value="{{ old('nino_fecha_nacimiento') }}">
-                            </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Documento
+                                    </label>
+                                    <input name="colaborador_documento" type="text" required
+                                           value="{{ old('colaborador_documento') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Institución (opcional)
-                                </label>
-                                <input name="institucion" type="text"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       value="{{ old('institucion') }}">
-                            </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Línea de negocio
+                                    </label>
+                                    <input name="linea_negocio" type="text" required
+                                           value="{{ old('linea_negocio') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Grado (opcional)
-                                </label>
-                                <input name="grado" type="text"
-                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                       value="{{ old('grado') }}">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Área
+                                    </label>
+                                    <input name="area" type="text" required
+                                           value="{{ old('area') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
+
                             </div>
                         </div>
 
-                        <div class="mt-6 space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Documento del niño (PDF opcional)
-                                </label>
-                                <input name="pdf_documento" type="file" accept=".pdf,application/pdf"
-                                       class="mt-1 block w-full text-sm text-gray-700">
-                            </div>
+                        {{-- ========================= --}}
+                        {{-- DATOS DEL NIÑO --}}
+                        {{-- ========================= --}}
+                        <div class="space-y-6 pt-6 border-t border-slate-200">
+                            <h3 class="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                                Información del niño
+                            </h3>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    Certificado / soporte (PDF opcional)
-                                </label>
-                                <input name="pdf_certificado" type="file" accept=".pdf,application/pdf"
-                                       class="mt-1 block w-full text-sm text-gray-700">
-                            </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                            <p class="text-xs text-gray-500">
-                                * Si los archivos no abren luego, asegúrate de tener <code>php artisan storage:link</code>.
-                            </p>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Nombre completo
+                                    </label>
+                                    <input name="nino_nombre" type="text" required
+                                           value="{{ old('nino_nombre') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Documento
+                                    </label>
+                                    <input name="nino_documento" type="text" required
+                                           value="{{ old('nino_documento') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Edad
+                                    </label>
+                                    <input name="edad" type="number" min="1" required
+                                           value="{{ old('edad') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Grado
+                                    </label>
+                                    <input name="grado" type="text" required
+                                           value="{{ old('grado') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
+
+                                <div class="md:col-span-2">
+                                    <label class="block text-sm font-medium text-slate-700">
+                                        Institución
+                                    </label>
+                                    <input name="institucion" type="text" required
+                                           value="{{ old('institucion') }}"
+                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
+                                </div>
+
+                            </div>
                         </div>
 
-                        <div class="mt-6 flex items-center justify-end gap-3">
+                        {{-- BOTONES --}}
+                        <div class="flex justify-end gap-4 pt-8">
                             <a href="{{ route('kits.dashboard') }}"
-                               class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                               class="inline-flex items-center rounded-xl border border-slate-300 bg-white px-6 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
                                 Cancelar
                             </a>
 
                             <button type="submit"
-                                    class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                                    class="inline-flex items-center rounded-xl bg-slate-900 px-6 py-2.5 text-sm font-semibold text-white hover:bg-slate-700 transition shadow-sm">
                                 Guardar registro
                             </button>
                         </div>
@@ -122,4 +206,4 @@
 
         </div>
     </div>
-</x-app-layout>
+</x-app-kits-layout>

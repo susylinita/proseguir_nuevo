@@ -24,9 +24,16 @@ class PostulacionPolicy
     }
 
     public function update(User $user, Postulacion $postulacion): bool
-    {
-        return $this->isPanelAdmin($user);
+{
+    // Admin puede siempre
+    if ($this->isPanelAdmin($user)) {
+        return true;
     }
+
+    // Estudiante solo si es dueño y está pendiente
+    return $postulacion->user_id === $user->id
+        && $postulacion->estado === 'Pendiente';
+}
 
     public function delete(User $user, Postulacion $postulacion): bool
     {

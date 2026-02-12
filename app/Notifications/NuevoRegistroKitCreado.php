@@ -6,7 +6,8 @@ use App\Models\KitRegistro;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
-use App\Filament\Resources\KitRegistroResource;
+use App\Filament\Resources\KitEscolarResource;
+
 
 class NuevoRegistroKitCreado extends Notification
 {
@@ -23,14 +24,14 @@ class NuevoRegistroKitCreado extends Notification
 
     public function toMail($notifiable): MailMessage
     {
-        $url = KitRegistroResource::getUrl('edit', [
+        $url = KitEscolarResource::getUrl('edit', [
             'record' => $this->registro,
         ], panel: 'admin');
 
         return (new MailMessage)
             ->subject('Nuevo registro de Kit Escolar')
             ->line('Se ha creado un nuevo registro de kit escolar.')
-            ->line('Niño: ' . ($this->registro->nino_nombre ?? 'N/D'))
+            ->line('Niño: ' . $this->registro->nino_nombre)
             ->action('Abrir en el panel', url($url));
     }
 }

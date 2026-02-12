@@ -8,28 +8,41 @@ use App\Models\Postulacion;
 class DashboardController extends Controller
 {
     public function index()
-    {
-        $userId = auth()->id();
+{
+    $userId = auth()->id();
 
-        $postulaciones = Postulacion::where('user_id', $userId)
-            ->latest()
-            ->get();
+    $postulaciones = Postulacion::where('user_id', $userId)
+        ->latest()
+        ->get();
 
-        $ultima = Postulacion::where('user_id', $userId)
-            ->latest()
-            ->first();
+    // 📊 Contadores para los widgets
+    $counts = [
+        'total' => $postulaciones->count(),
+        'pendiente' => $postulaciones->where('estado', 'Pendiente')->count(),
+        'preseleccionado' => $postulaciones->where('estado', 'Preseleccionado')->count(),
+        'aprobado' => $postulaciones->where('estado', 'Aprobado')->count(),
+        'rechazado' => $postulaciones->where('estado', 'Rechazado')->count(),
+    ];
 
-        if ($ultima) {
-            $ultima->load(['historicoEstados' => fn ($q) => $q->orderBy('cambiado_en')]);
-        }
+    $ultima = $postulaciones->first();
 
-        // Documentos pendientes en la última postulación (si existe)
-        $pendientes = [];
-        if ($ultima) {
-            if (!$ultima->pdf_notas) $pendientes[] = 'PDF de notas';
-            if (!$ultima->pdf_matricula) $pendientes[] = 'PDF de matrícula';
-        }
-
-        return view('student.postulaciones.dashboard', compact('postulaciones', 'ultima', 'pendientes'));
+    if ($ultima) {
+        $ultima->load([
+            'historicoEstados' => fn ($q) => $q->orderBy('cambiado_en')
+        ]);
     }
+
+    // 📄 Documentos pendientes en la última postulación
+    $pendientes = [];
+    if ($ultima) {
+        if (!$ultima->pdf_notas) $pendientes[] = 'PDF de notas';
+        if (!$ultima->pdf_matricula) $pendientes[] = 'PDF de matrícula';
+    }
+
+    return view(
+        'student.postulaciones.dashboard',
+        compact('postulaciones', 'ultima', 'pendientes', 'counts')
+    );
+}
+
 }

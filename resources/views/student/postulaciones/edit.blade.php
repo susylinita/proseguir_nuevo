@@ -1,16 +1,87 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                Editar postulación #{{ $postulacion->id }}
-            </h2>
+    <div class="rounded-2xl p-8 
+                bg-gradient-to-r from-slate-100 via-slate-200 to-blue-100 
+                border border-slate-200 shadow-sm">
 
-            <a href="{{ route('student.postulaciones.show', $postulacion) }}"
-               class="text-sm text-gray-600 hover:text-gray-900">
-                Cancelar
-            </a>
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+
+            {{-- Lado izquierdo --}}
+            <div>
+
+                {{-- Badge --}}
+                <div class="inline-flex items-center gap-2 
+                            px-4 py-1.5 rounded-full 
+                            bg-white/70 backdrop-blur 
+                            border border-slate-300 
+                            text-xs font-medium text-slate-700 shadow-sm">
+                    ✏️ Editando solicitud
+                </div>
+
+                {{-- Título --}}
+                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
+                    Editar postulación #{{ $postulacion->id }}
+                </h1>
+
+                {{-- Descripción --}}
+                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
+                    Puedes modificar tu información mientras la postulación esté en estado
+                    <span class="font-semibold">Pendiente</span>.
+                </p>
+
+                <p class="mt-3 text-sm text-slate-500">
+                    Verifica cuidadosamente antes de guardar los cambios.
+                </p>
+            </div>
+
+            {{-- Botones derecha --}}
+            <div class="flex items-center gap-4">
+
+                <a href="{{ route('student.postulaciones.show', $postulacion) }}"
+                   class="inline-flex items-center gap-2 
+                          bg-white border border-slate-300 
+                          text-slate-700 px-6 py-3 
+                          rounded-xl font-medium 
+                          hover:bg-slate-50 transition">
+                    ← Volver al detalle
+                </a>
+
+                <a href="{{ route('student.postulaciones.index') }}"
+                   class="inline-flex items-center gap-2 
+                          bg-white border border-slate-300 
+                          text-slate-700 px-6 py-3 
+                          rounded-xl font-medium 
+                          hover:bg-slate-50 transition">
+                    Mis postulaciones
+                </a>
+    </div>
+</x-slot>
+
+<div class="max-w-5xl mx-auto py-10 px-6">
+    
+
+    @if ($errors->any())
+        <div class="mb-6 rounded-md bg-red-50 p-4 border border-red-200">
+            <div class="text-sm font-semibold text-red-800">Revisa los campos:</div>
+            <ul class="mt-2 list-disc list-inside text-sm text-red-700">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
         </div>
-    </x-slot>
+    @endif
+
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
+        <div class="p-8 text-slate-900">
+
+            <form method="POST"
+                  action="{{ route('student.postulaciones.update', $postulacion) }}"
+                  enctype="multipart/form-data"
+                  class="space-y-6">
+                @csrf
+                @method('PUT')
+
+
 
     @php
         $tipo = old('tipo_postulacion', $postulacion->tipo_postulacion ?? 'primer_semestre');
@@ -27,8 +98,7 @@
         };
     @endphp
 
-    <div class="py-12">
-        <div class="max-w-3xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    
 
             @if ($errors->any())
                 <div class="rounded-md bg-red-50 p-4">
@@ -467,20 +537,19 @@
 
                         <div class="mt-6 flex items-center justify-end gap-3">
                             <a href="{{ route('student.postulaciones.show', $postulacion) }}"
-                               class="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+                             class="px-6 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
                                 Cancelar
                             </a>
 
                             <button type="submit"
-                                    class="inline-flex items-center rounded-md bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                              class="px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-black transition shadow-sm">
                                 Guardar cambios
                             </button>
-                        </div>
+
                     </form>
 
                 </div>
             </div>
 
-        </div>
-    </div>
+
 </x-app-layout>

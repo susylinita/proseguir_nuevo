@@ -30,13 +30,16 @@ class KitRegistroController extends Controller
         $pdfRules = ['nullable', 'file', 'max:5120'];
 
         $data = $request->validate([
-            'nino_nombre' => ['required', 'string', 'max:255'],
-            'nino_documento' => ['nullable', 'string', 'max:80'],
-            'nino_fecha_nacimiento' => ['nullable', 'date'],
-            'institucion' => ['nullable', 'string', 'max:255'],
-            'grado' => ['nullable', 'string', 'max:50'],
-            'pdf_documento' => $pdfRules,
-            'pdf_certificado' => $pdfRules,
+            'colaborador_nombre' => 'required|string|max:255',
+            'colaborador_documento' => 'required|string|max:50',
+            'linea_negocio' => 'required|string|max:255',
+            'area' => 'required|string|max:255',
+
+            'nino_nombre' => 'required|string|max:255',
+            'nino_documento' => 'required|string|max:50',
+            'edad' => 'required|integer|min:1',
+            'grado' => 'required|string|max:100',
+            'institucion' => 'required|string|max:255',
         ]);
 
         // ✅ Validación manual por extensión
@@ -90,59 +93,25 @@ class KitRegistroController extends Controller
     }
 
     public function update(Request $request, KitRegistro $registro)
-    {
-        abort_unless($registro->user_id === auth()->id(), 403);
-        abort_if(in_array($registro->estado, ['Aprobado', 'Rechazado', 'Entregado']), 403);
+{
+    $data = $request->validate([
+        'colaborador_nombre' => ['required', 'string', 'max:255'],
+        'colaborador_documento' => ['required', 'string', 'max:255'],
+        'linea_negocio' => ['required', 'string', 'max:255'],
+        'area' => ['required', 'string', 'max:255'],
 
-        $pdfRules = ['nullable', 'file', 'max:5120'];
+        'nino_nombre' => ['required', 'string', 'max:255'],
+        'nino_documento' => ['required', 'string', 'max:255'],
+        'edad' => ['required', 'integer', 'min:1'],
+        'grado' => ['required', 'string', 'max:255'],
+        'institucion' => ['required', 'string', 'max:255'],
+    ]);
 
-        $data = $request->validate([
-            'nino_nombre' => ['required', 'string', 'max:255'],
-            'nino_documento' => ['nullable', 'string', 'max:80'],
-            'nino_fecha_nacimiento' => ['nullable', 'date'],
-            'institucion' => ['nullable', 'string', 'max:255'],
-            'grado' => ['nullable', 'string', 'max:50'],
-            'pdf_documento' => $pdfRules,
-            'pdf_certificado' => $pdfRules,
-        ]);
+    $registro->update($data);
 
-        // ✅ Validación manual por extensión
-        foreach (['pdf_documento', 'pdf_certificado'] as $field) {
-            if ($request->hasFile($field)) {
-                $ext = strtolower($request->file($field)->getClientOriginalExtension());
-                if ($ext !== 'pdf') {
-                    return back()->withErrors([
-                        $field => 'El archivo debe ser PDF (.pdf).',
-                    ])->withInput();
-                }
-            }
-        }
+    return redirect()
+        ->route('kits.registros.show', $registro)
+        ->with('status', 'Registro actualizado correctamente.');
+}
 
-        // ✅ Reemplazar archivos, borrando el anterior y forzando .pdf
-        if ($request->hasFile('pdf_documento')) {
-            if ($registro->pdf_documento) {
-                Storage::disk('public')->delete($registro->pdf_documento);
-            }
-
-            $file = $request->file('pdf_documento');
-            $name = Str::random(40) . '.pdf';
-            $data['pdf_documento'] = $file->storeAs('kits/documento', $name, 'public');
-        }
-
-        if ($request->hasFile('pdf_certificado')) {
-            if ($registro->pdf_certificado) {
-                Storage::disk('public')->delete($registro->pdf_certificado);
-            }
-
-            $file = $request->file('pdf_certificado');
-            $name = Str::random(40) . '.pdf';
-            $data['pdf_certificado'] = $file->storeAs('kits/certificado', $name, 'public');
-        }
-
-        $registro->update($data);
-
-        return redirect()
-            ->route('kits.registros.show', $registro)
-            ->with('status', 'Registro actualizado correctamente.');
-    }
 }

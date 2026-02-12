@@ -12,15 +12,15 @@ return new class extends Migration
     public function up(): void
 {
     Schema::table('postulacions', function (Blueprint $table) {
-        $table->timestamp('aprobado_en')->nullable()->after('estado_actualizado_en');
-        $table->timestamp('rechazado_en')->nullable()->after('aprobado_en');
+        $table->timestamp('fecha_aprobacion')->nullable()->after('estado_actualizado_en');
+        $table->timestamp('rechazado_en')->nullable()->after('fecha_aprobacion');
     });
 }
 
 public function down(): void
 {
     Schema::table('postulacions', function (Blueprint $table) {
-        $table->dropColumn(['aprobado_en', 'rechazado_en']);
+        $table->dropColumn(['fecha_aprobacion', 'rechazado_en']);
     });
 }
 };

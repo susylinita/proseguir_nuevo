@@ -1,41 +1,160 @@
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="es">
 <head>
-    <title>Reporte de Entregas - Fundación Proseguir</title>
+    <meta charset="utf-8">
     <style>
-        body { font-family: sans-serif; font-size: 12px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2 f2 f2; }
-        .header { text-align: center; margin-bottom: 20px; }
+        body { 
+            font-family: DejaVu Sans, sans-serif; 
+            font-size: 11px; 
+            color: #111; 
+        }
+
+        .header {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-bottom: 12px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .meta {
+            font-size: 10px;
+            color:#555;
+            text-align:right;
+        }
+
+        table {
+            width:100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 6px;
+            vertical-align: top;
+        }
+
+        th {
+            background: #f3f4f6;
+            text-align:left;
+        }
+
+        .badge {
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 10px;
+            display:inline-block;
+            font-weight: bold;
+        }
+
+        .pendiente { background:#FEF3C7; }
+        .aprobado { background:#D1FAE5; }
+        .rechazado { background:#FECACA; }
+        .entregado { background:#DBEAFE; }
+
+        .small {
+            font-size: 9px;
+            color:#555;
+        }
+
+        .footer {
+            margin-top:20px;
+            font-size:9px;
+            color:#777;
+            text-align:center;
+        }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Fundación Proseguir</h1>
-        <h2>Reporte General de Entrega de Kits Escolares</h2>
-        <p>Fecha de generación: {{ $fecha }}</p>
+
+<div class="header">
+    <div>
+        <img src="{{ public_path('brand/logo.png') }}" style="height:48px;">
     </div>
 
-    <table>
-        <thead>
+    <div class="meta">
+        <div><strong>{{ $titulo }}</strong></div>
+        <div>Fecha generación: {{ $fecha->format('Y-m-d H:i') }}</div>
+    </div>
+</div>
+
+<h1 class="title">{{ $titulo }}</h1>
+
+<p style="margin:6px 0 12px 0; color:#444;">
+    Total registros: <strong>{{ $kits->count() }}</strong>
+</p>
+
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Colaborador</th>
+            <th>Documento</th>
+            <th>Niño</th>
+            <th>Edad</th>
+            <th>Grado</th>
+            <th>Institución</th>
+            <th>Estado</th>
+            <th>Aprobación</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach($kits as $k)
+
+            @php
+                $estado = $k->estado ?? 'Pendiente';
+
+                $badgeClass = match($estado) {
+                    'Pendiente' => 'pendiente',
+                    'Aprobado' => 'aprobado',
+                    'Rechazado' => 'rechazado',
+                    'Entregado' => 'entregado',
+                    default => '',
+                };
+            @endphp
+
             <tr>
-                <th>Estudiante</th>
-                <th>Grado</th>
-                <th>Tipo de Kit</th>
-                <th>Fecha de Entrega</th>
+                <td>{{ $k->id }}</td>
+                <td>{{ $k->colaborador_nombre }}</td>
+                <td>{{ $k->colaborador_documento }}</td>
+                <td>{{ $k->nino_nombre }}</td>
+                <td>{{ $k->edad }}</td>
+                <td>{{ $k->grado }}</td>
+                <td>{{ $k->institucion }}</td>
+
+                <td>
+                    <span class="badge {{ $badgeClass }}">
+                        {{ $estado }}
+                    </span>
+                </td>
+
+                <td class="small">
+                    @if($estado === 'Aprobado' || $estado === 'Entregado')
+                        <strong>Por:</strong> {{ $k->aprobador->name ?? 'N/A' }}<br>
+                        <strong>Fecha:</strong> 
+                        {{ optional($k->fecha_aprobacion)->format('d/m/Y H:i') }}
+                    @elseif($estado === 'Rechazado')
+                        <strong>Motivo:</strong><br>
+                        {{ $k->observaciones ?? 'Sin observaciones' }}
+                    @else
+                        —
+                    @endif
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach($kits as $kit)
-            <tr>
-                <td>{{ $kit->nombre_estudiante }}</td>
-                <td>{{ $kit->grado_escolar }}</td>
-                <td>{{ $kit->tipo_kit }}</td>
-                <td>{{ $kit->fecha_entrega }}</td>
-            </tr>
-            @endforeach
-        </tbody>
-    </table>
+
+        @endforeach
+    </tbody>
+</table>
+
+<div class="footer">
+    Fundación Proseguir © {{ date('Y') }} — Documento generado automáticamente por el sistema.
+</div>
+
 </body>
 </html>

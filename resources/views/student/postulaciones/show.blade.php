@@ -1,36 +1,80 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex items-center justify-between">
+    <div class="rounded-2xl p-8 
+                bg-gradient-to-r from-slate-100 via-slate-200 to-emerald-100 
+                border border-slate-200 shadow-sm">
+
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+
+            {{-- Lado izquierdo --}}
             <div>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Detalle de postulación #{{ $postulacion->id }}
-                </h2>
-                <p class="text-sm text-gray-500 mt-1">
-                    Revisa el estado, documentos y el historial de tu postulación.
+
+                {{-- Badge superior --}}
+                <div class="inline-flex items-center gap-2 
+                            px-4 py-1.5 rounded-full 
+                            bg-white/70 backdrop-blur 
+                            border border-slate-300 
+                            text-xs font-medium text-slate-700 shadow-sm">
+                    📄 Postulación
+                </div>
+
+                {{-- Título --}}
+                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
+                    Detalle de postulación 
+                    <span class="text-slate-600">#{{ $postulacion->id }}</span>
+                </h1>
+
+                {{-- Descripción --}}
+                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
+                    Revisa el estado actual, los documentos cargados y el historial
+                    de movimientos de tu postulación.
+                </p>
+
+                {{-- Fecha --}}
+                <p class="mt-3 text-sm text-slate-500">
+                    Última actualización:
+                    {{ optional($postulacion->updated_at)->format('Y-m-d H:i') }}
                 </p>
             </div>
 
-            <div class="flex items-center gap-3">
-                <a href="{{ route('student.dashboard') }}"
-                class="text-sm text-gray-600 hover:text-gray-900">
-                    Volver al dashboard
-                </a>
+            {{-- Botones derecha --}}
+            <div class="flex flex-wrap items-center gap-4">
 
                 <a href="{{ route('student.postulaciones.index') }}"
-                class="text-sm text-gray-600 hover:text-gray-900">
-                    Volver a mis postulaciones
+                   class="inline-flex items-center gap-2 
+                          bg-blue-600 text-white 
+                          px-6 py-3 rounded-xl 
+                          font-semibold shadow-md 
+                          hover:bg-blue-700 transition">
+                    Ver mis postulaciones
+                </a>
+
+                <a href="{{ route('student.dashboard') }}"
+                   class="inline-flex items-center gap-2 
+                          bg-white border border-slate-300 
+                          text-slate-700 px-6 py-3 
+                          rounded-xl font-medium 
+                          hover:bg-slate-50 transition">
+                    Volver al dashboard
                 </a>
 
                 @if (($postulacion->estado ?? '') === 'Pendiente')
                     <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
-                    class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
+                       class="inline-flex items-center gap-2 
+                              bg-slate-900 text-white 
+                              px-6 py-3 rounded-xl 
+                              font-semibold shadow-md 
+                              hover:bg-slate-800 transition">
                         Editar
                     </a>
                 @endif
+
             </div>
 
         </div>
-    </x-slot>
+    </div>
+</x-slot>
+
 
     @php
         $estado = $postulacion->estado ?? 'N/D';
@@ -75,8 +119,8 @@
         $fileUrl = fn(string $field) => route('student.postulaciones.file', [$postulacion, $field]);
     @endphp
 
-    <div class="py-12">
-        <div class="max-w-5xl mx-auto sm:px-6 lg:px-8 space-y-6">
+    <div class="py-12 bg-slate-50 min-h-screen">
+    <div class="max-w-6xl mx-auto px-6 space-y-8">
 
             @if (session('status'))
                 <div class="rounded-md bg-green-50 p-4 text-sm text-green-700">
@@ -84,35 +128,40 @@
                 </div>
             @endif
 
-            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 space-y-4">
+            <div class="bg-white border border-slate-200 rounded-2xl shadow-sm">
+                <div class="p-10 space-y-8">
 
-                    <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Estado</div>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                            <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Estado</div>
                             <div class="mt-2">
-                                <span class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium {{ $badge }}">
+                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $badge }}">
+
                                     {{ $estado }}
                                 </span>
                             </div>
                         </div>
 
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Tipo</div>
+                        <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                            <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Tipo</div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
                                 {{ $tipoLabel }}
                             </div>
                         </div>
 
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Última actualización</div>
+                        <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                            <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Última actualización</div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
                                 {{ optional($postulacion->updated_at)->format('Y-m-d H:i') }}
                             </div>
                         </div>
 
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500">Pendientes</div>
+                        <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                            <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Pendientes</div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
                                 {{ count($pendientes) }}
                             </div>
@@ -120,8 +169,9 @@
                     </div>
 
                     {{-- Pendientes --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Pendientes o incompletos</div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Pendientes o incompletos</div>
 
                         @if (count($pendientes) === 0)
                             <div class="mt-2 text-sm text-green-700">
@@ -150,54 +200,77 @@
                     </div>
 
                     {{-- Timeline --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Estado visual</div>
+<div class="border border-slate-200 rounded-2xl p-8 bg-white shadow-sm">
+    <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+        Estado del proceso
+    </div>
 
-                        @if ($rechazada)
-                            <div class="mt-3 rounded-md bg-red-50 p-4 text-sm text-red-700">
-                                Tu postulación fue rechazada. Si necesitas aclaraciones, revisa el perfil descriptivo o contacta a la Fundación.
-                            </div>
-                        @endif
+    @if ($rechazada)
+        <div class="mt-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+            Tu postulación fue rechazada. Si necesitas aclaraciones, revisa el perfil descriptivo o contacta a la Fundación.
+        </div>
+    @endif
 
-                        <div class="mt-4">
-                            <ol class="flex items-center justify-between gap-2">
-                                @foreach ($etapas as $i => $etapa)
-                                    @php
-                                        $completa = ($indiceEstado >= $i);
-                                        $actual = ($estado === $etapa);
-                                        $dot = $completa ? 'bg-gray-900' : 'bg-gray-300';
-                                        $txt = $completa ? 'text-gray-900' : 'text-gray-500';
-                                        $line = $completa ? 'bg-gray-900' : 'bg-gray-200';
-                                    @endphp
+    <div class="mt-8">
+        <ol class="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
 
-                                    <li class="flex-1">
-                                        <div class="flex items-center">
-                                            <div class="h-3 w-3 rounded-full {{ $dot }}"></div>
+            @foreach ($etapas as $i => $etapa)
+                @php
+                    $completa = ($indiceEstado >= $i);
+                    $actual = ($estado === $etapa);
 
-                                            @if (!$loop->last)
-                                                <div class="mx-2 h-0.5 flex-1 {{ $line }}"></div>
-                                            @endif
-                                        </div>
+                    $circle = $completa
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-200 text-slate-500';
 
-                                        <div class="mt-2 text-xs font-medium {{ $txt }}">
-                                            {{ $etapa }}
-                                            @if ($actual)
-                                                <span class="text-gray-500 font-normal"> (Actual)</span>
-                                            @endif
-                                        </div>
-                                    </li>
-                                @endforeach
-                            </ol>
+                    $line = $completa
+                        ? 'bg-slate-900'
+                        : 'bg-slate-200';
+                @endphp
+
+                <li class="flex-1 relative">
+
+                    <div class="flex md:flex-col items-center md:items-center gap-4">
+
+                        {{-- Círculo --}}
+                        <div class="relative z-10 flex items-center justify-center h-10 w-10 rounded-full text-sm font-semibold shadow {{ $circle }}">
+                            {{ $i + 1 }}
                         </div>
 
-                        <p class="mt-3 text-xs text-gray-500">
-                            Las etapas pueden avanzar según revisión de coordinación y aprobación de gerencia.
-                        </p>
+                        {{-- Línea horizontal (desktop) --}}
+                        @if (!$loop->last)
+                            <div class="hidden md:block absolute top-5 left-1/2 w-full h-0.5 {{ $line }}"></div>
+                        @endif
+
+                        {{-- Texto --}}
+                        <div class="text-sm font-medium {{ $completa ? 'text-slate-900' : 'text-slate-400' }}">
+                            {{ $etapa }}
+
+                            @if ($actual)
+                                <span class="block text-xs text-slate-500 mt-1">
+                                    Etapa actual
+                                </span>
+                            @endif
+                        </div>
+
                     </div>
 
+                </li>
+            @endforeach
+
+        </ol>
+    </div>
+
+    <p class="mt-8 text-xs text-slate-500">
+        Las etapas pueden avanzar según revisión de coordinación y aprobación de gerencia.
+    </p>
+</div>
+
+
                     {{-- Datos del estudiante + foto --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500 mb-4">
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+
                             Datos del estudiante
                         </div>
 
@@ -274,8 +347,8 @@
                     </div>
 
                     {{-- Acudiente --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Datos del acudiente</div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">Datos del acudiente</div>
 
                         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
@@ -290,8 +363,9 @@
                     </div>
 
                     {{-- Estudios --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Estudios</div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Estudios</div>
 
                         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             @if ($tipo === 'primer_semestre')
@@ -326,8 +400,9 @@
                     </div>
 
                     {{-- Datos bancarios --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Datos bancarios</div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Datos bancarios</div>
 
                         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
@@ -359,23 +434,25 @@
                     </div>
 
                     {{-- Información adicional --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Información adicional</div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Información adicional</div>
                         <div class="mt-2 text-sm text-gray-800 whitespace-pre-line">
                             {{ $postulacion->como_encontro ?: 'Sin respuesta.' }}
                         </div>
                     </div>
 
                     {{-- Perfil descriptivo --}}
-                    <div class="rounded-md border border-gray-200 p-4">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Perfil descriptivo (coordinación)</div>
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Perfil descriptivo (coordinación)</div>
                         <div class="mt-2 text-sm text-gray-800 whitespace-pre-line">
                             {{ $postulacion->perfil_descriptivo ?? 'Aún no hay perfil descriptivo registrado.' }}
                         </div>
                     </div>
 
                     {{-- Documentos (INLINE, no descarga) --}}
-                    <div class="rounded-md border border-gray-200 p-4">
+                    <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
                             Documentos
                         </div>
@@ -430,7 +507,8 @@
             @if (method_exists($postulacion, 'historicoEstados') && $postulacion->relationLoaded('historicoEstados'))
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
-                        <div class="text-xs uppercase tracking-wider text-gray-500">Historial de cambios</div>
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+Historial de cambios</div>
 
                         @if ($postulacion->historicoEstados->isEmpty())
                             <div class="mt-3 text-sm text-gray-600">No hay historial registrado.</div>

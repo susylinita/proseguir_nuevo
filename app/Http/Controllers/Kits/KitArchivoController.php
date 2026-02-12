@@ -15,7 +15,7 @@ class KitArchivoController extends Controller
         // 🔒 Solo el dueño o admin/coordinador/gerente
         abort_unless(
             auth()->id() === $registro->user_id
-            || auth()->user()->hasRole(['coordinador','gerente'])
+            || auth()->user()->hasRole(['admin'])
             || auth()->user()->is_admin,
             403
         );
@@ -32,7 +32,7 @@ class KitArchivoController extends Controller
     {
         abort_unless(
             auth()->id() === $registro->user_id
-            || auth()->user()->hasRole(['coordinador','gerente'])
+            || auth()->user()->hasRole(['admin'])
             || auth()->user()->is_admin,
             403
         );

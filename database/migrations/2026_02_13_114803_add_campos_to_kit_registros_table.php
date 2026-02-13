@@ -12,17 +12,45 @@ return new class extends Migration
     public function up(): void
 {
     Schema::table('kit_registros', function (Blueprint $table) {
-        $table->string('colaborador_nombre')->nullable();
-        $table->string('colaborador_documento')->nullable();
-        $table->string('linea_negocio')->nullable();
-        $table->string('area')->nullable();
-        $table->string('nino_nombre')->nullable();
-        $table->string('nino_documento')->nullable();
-        $table->integer('edad')->nullable();
-        $table->string('grado')->nullable();
-        $table->string('institucion')->nullable();
+
+        if (!Schema::hasColumn('kit_registros', 'colaborador_nombre')) {
+            $table->string('colaborador_nombre')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'colaborador_documento')) {
+            $table->string('colaborador_documento')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'linea_negocio')) {
+            $table->string('linea_negocio')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'area')) {
+            $table->string('area')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'nino_nombre')) {
+            $table->string('nino_nombre')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'nino_documento')) {
+            $table->string('nino_documento')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'edad')) {
+            $table->integer('edad')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'grado')) {
+            $table->string('grado')->nullable();
+        }
+
+        if (!Schema::hasColumn('kit_registros', 'institucion')) {
+            $table->string('institucion')->nullable();
+        }
     });
 }
+
 
 public function down(): void
 {

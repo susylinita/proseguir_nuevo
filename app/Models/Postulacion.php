@@ -58,6 +58,9 @@ class Postulacion extends Model
         'perfil_descriptivo',
         'pdf_notas',
         'pdf_matricula',
+
+        'acepta_politica',
+        'fecha_aceptacion_politica',
     ];
 
     protected $casts = [
@@ -84,6 +87,18 @@ class Postulacion extends Model
     {
         return $this->belongsTo(\App\Models\User::class, 'estado_actualizado_por');
     }
+
+        protected static function booted()
+    {
+        static::creating(function ($model) {
+            if ($model->acepta_tratamiento_datos) {
+                $model->fecha_aceptacion_politica = now();
+                $table->string('ip_aceptacion')->nullable();
+                $table->string('version_politica')->nullable();
+            }
+        });
+    }
+
 
 }
 

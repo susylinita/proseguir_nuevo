@@ -260,6 +260,27 @@ class PostulacionResource extends Resource
             ])
             ->columns(2),
 
+            Forms\Components\Section::make('Autorización de tratamiento de datos')
+    ->schema([
+        Forms\Components\Checkbox::make('acepta_politica')
+            ->label(fn () => new \Illuminate\Support\HtmlString(
+                'Autorizo de manera previa, expresa e informada el tratamiento de mis datos personales y acepto la <a href="/documentos/politica-datos.pdf" target="_blank" class="text-primary-600 underline">Política de Tratamiento de Datos Personales</a>'
+            ))
+            ->accepted()
+            ->required(),
+    ])
+    ->visible(function ($record) {
+        $user = auth()->user();
+
+        // ✅ Solo si NO es admin
+        $esAdmin = $user?->hasRole('admin') || $user?->hasRole('gerente');
+
+        // ✅ Solo cuando está creando
+        return ! $esAdmin && $record === null;
+    })
+    ->columns(1),
+
+
         Forms\Components\Section::make('Gestión Interna')
             ->schema([
                 Forms\Components\Select::make('estado')
@@ -332,6 +353,7 @@ class PostulacionResource extends Resource
                         if (! $record) return true;
                         return $record->estado !== 'Entrevista';
                     })
+                    
 
             ])
             ->columns(1),

@@ -21,10 +21,14 @@ class KitRegistro extends Model
     'grado',
     'institucion',
     'estado',
-    'observaciones'
+    'observaciones',
+    'acepta_politica',
+    'fecha_aceptacion_politica',
 ];
 
-
+    protected $attributes = [
+        'estado' => 'Pendiente',
+    ];  
 
     public function user()
     {
@@ -39,5 +43,16 @@ class KitRegistro extends Model
     public function aprobador()
     {
         return $this->belongsTo(User::class, 'aprobado_por');
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            if ($model->acepta_politica) {
+                $model->fecha_aceptacion_politica = now();
+                $model->ip_aceptacion = request()->ip();
+                $model->version_politica = 'v1.0_2026';
+            }
+        });
     }
 }

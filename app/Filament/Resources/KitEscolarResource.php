@@ -32,6 +32,14 @@ class KitEscolarResource extends Resource
     {
         return $form->schema([
 
+                Forms\Components\Select::make('user_id')
+                    ->label('Postulante')
+                    ->relationship('user', 'name') // o 'email'
+                    ->searchable()
+                    ->preload()
+                    ->required()
+                    ->columnSpanFull(),
+
             Forms\Components\Section::make('Información del colaborador')
                 ->schema([
                     Forms\Components\TextInput::make('colaborador_nombre')
@@ -92,6 +100,11 @@ class KitEscolarResource extends Resource
     {
         return $table
             ->columns([
+
+                 Tables\Columns\TextColumn::make('user.name')
+                    ->label('Postulante')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('colaborador_nombre')
                     ->label('Colaborador')
                     ->searchable()

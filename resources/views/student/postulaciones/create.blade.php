@@ -424,6 +424,44 @@
                             </div>
                         </div>
 
+                        <div class="mt-4">
+    <div class="form-check mt-3">
+    <input 
+        class="form-check-input" 
+        type="checkbox" 
+        name="acepta_tratamiento_datos" 
+        id="acepta_tratamiento_datos" 
+        value="1"
+        {{ old('acepta_tratamiento_datos') ? 'checked' : '' }}
+        required
+    >
+
+    <label class="form-check-label" for="acepta_tratamiento_datos">
+        He leído y Acepto la 
+        <a href="{{ asset('storage/politica-datos.pdf') }}" 
+            target="_blank" 
+            style="color: #0d6efd; text-decoration: underline;">
+                Política de Tratamiento de Datos Personales
+            </a>
+
+    </label>
+
+    @error('acepta_tratamiento_datos')
+        <div class="text-danger mt-1">
+            {{ $message }}
+        </div>
+    @enderror
+</div>
+
+
+    </div>
+
+    @error('acepta_tratamiento_datos')
+        <small class="text-danger">{{ $message }}</small>
+    @enderror
+</div>
+
+
                         {{-- BOTONES --}}
                     <div class="flex justify-end gap-4 pt-4 border-t border-slate-200">
                         <a href="{{ route('student.postulaciones.index') }}"

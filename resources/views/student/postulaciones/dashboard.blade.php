@@ -1,5 +1,4 @@
 <x-app-layout>
-   
 
     {{-- micro-animaciones sin librerías --}}
     <style>
@@ -77,13 +76,13 @@
                 </div>
 
                 <div class="reveal rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Pendientes</div>
-                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['pendiente'] ?? 0 }}</div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Postuladas</div>
+                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['postulado'] ?? 0 }}</div>
                 </div>
 
                 <div class="reveal rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Preseleccionadas</div>
-                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['preseleccionado'] ?? 0 }}</div>
+                    <div class="text-xs font-semibold text-slate-500 uppercase tracking-wider">En estudio</div>
+                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['en_estudio'] ?? 0 }}</div>
                 </div>
 
                 <div class="reveal rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -126,6 +125,7 @@
                             <thead class="bg-slate-50">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">#</th>
+                                    <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Tipo</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Estado</th>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">Actualizado</th>
                                     <th class="px-4 py-3 text-right text-xs font-semibold text-slate-500 uppercase">Acción</th>
@@ -141,6 +141,17 @@
                                             'renovacion' => 'Renovación',
                                             default => 'N/D',
                                         };
+
+                                        $estado = $p->estado ?? 'Postulado';
+
+                                        $estadoClass = match ($estado) {
+                                            'Aprobado' => 'bg-emerald-50 text-emerald-800',
+                                            'Rechazado' => 'bg-red-50 text-red-800',
+                                            'En estudio' => 'bg-blue-50 text-blue-800',
+                                            'Cancelado' => 'bg-slate-100 text-slate-600',
+                                            'Postulado' => 'bg-slate-100 text-slate-800',
+                                            default => 'bg-slate-100 text-slate-800',
+                                        };
                                     @endphp
 
                                     <tr class="hover:bg-slate-50 transition">
@@ -153,14 +164,8 @@
                                         </td>
 
                                         <td class="px-4 py-3 text-sm text-slate-700">
-                                            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold
-                                                @if(($p->estado ?? '') === 'Aprobado') bg-emerald-50 text-emerald-800
-                                                @elseif(($p->estado ?? '') === 'Rechazado') bg-red-50 text-red-800
-                                                @elseif(($p->estado ?? '') === 'Entrevista') bg-blue-50 text-blue-800
-                                                @else bg-slate-100 text-slate-800
-                                                @endif
-                                            ">
-                                                {{ $p->estado ?? 'Pendiente' }}
+                                            <span class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold {{ $estadoClass }}">
+                                                {{ $estado }}
                                             </span>
                                         </td>
 
@@ -170,7 +175,7 @@
 
                                         <td class="px-4 py-3 text-sm text-right">
                                             <a href="{{ route('student.postulaciones.show', $p) }}"
-                                            class="font-semibold text-blue-800 hover:text-blue-900">
+                                               class="font-semibold text-blue-800 hover:text-blue-900">
                                                 Ver →
                                             </a>
                                         </td>
@@ -188,19 +193,19 @@
                 <div class="reveal rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div class="text-xs font-semibold text-blue-800">Paso 1</div>
                     <div class="mt-2 font-semibold text-slate-900">Crea tu postulación</div>
-                    <div class="mt-1 text-sm text-slate-600">Completa puntajes y adjunta PDFs si aplica.</div>
+                    <div class="mt-1 text-sm text-slate-600">Completa la información solicitada y adjunta los documentos requeridos.</div>
                 </div>
 
                 <div class="reveal rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div class="text-xs font-semibold text-emerald-700">Paso 2</div>
-                    <div class="mt-2 font-semibold text-slate-900">Revisión</div>
-                    <div class="mt-1 text-sm text-slate-600">Coordinación actualiza el estado y comentarios.</div>
+                    <div class="mt-2 font-semibold text-slate-900">En estudio</div>
+                    <div class="mt-1 text-sm text-slate-600">La Fundación revisa tu documentación y gestiona el proceso de evaluación.</div>
                 </div>
 
                 <div class="reveal rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <div class="text-xs font-semibold text-slate-700">Paso 3</div>
-                    <div class="mt-2 font-semibold text-slate-900">Seguimiento</div>
-                    <div class="mt-1 text-sm text-slate-600">Consulta historial y novedades desde el detalle.</div>
+                    <div class="mt-2 font-semibold text-slate-900">Resultado y seguimiento</div>
+                    <div class="mt-1 text-sm text-slate-600">Consulta el avance, el resultado de la solicitud y las novedades desde el detalle.</div>
                 </div>
             </div>
 

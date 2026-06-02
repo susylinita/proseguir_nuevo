@@ -32,11 +32,14 @@ class KitRegistroController extends Controller
         $data = $request->validate([
             'colaborador_nombre' => 'required|string|max:255',
             'colaborador_documento' => 'required|string|max:50',
-            'linea_negocio' => 'required|string|max:255',
+            'linea_negocio' => [
+            'required',
+            'string',
+            'in:PROSEGUIR SAS,PROSEGUIR SOLUCIONES DE LIQUIDEZ SAS,PROSEGUIR INMOBILIARIA SAS,SITEI SAS,SMART GAME SG SAS,EVOLUCIÓN INTELIGENTE SAS',
+        ],  
             'area' => 'required|string|max:255',
 
             'nino_nombre' => 'required|string|max:255',
-            'nino_documento' => 'required|string|max:50',
             'edad' => 'required|integer|min:1',
             'grado' => 'required|string|max:100',
             'institucion' => 'required|string|max:255',
@@ -101,7 +104,6 @@ class KitRegistroController extends Controller
         'area' => ['required', 'string', 'max:255'],
 
         'nino_nombre' => ['required', 'string', 'max:255'],
-        'nino_documento' => ['required', 'string', 'max:255'],
         'edad' => ['required', 'integer', 'min:1'],
         'grado' => ['required', 'string', 'max:255'],
         'institucion' => ['required', 'string', 'max:255'],

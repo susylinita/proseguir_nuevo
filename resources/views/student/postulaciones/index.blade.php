@@ -1,4 +1,13 @@
 <x-app-layout>
+
+    @if ($errors->has('general'))
+    <div class="mb-6 rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-red-800">
+        <strong>Solicitud bloqueada.</strong>
+        <p class="mt-1">{{ $errors->first('general') }}</p>
+        <p class="mt-1">Por favor, contacta al administrador.</p>
+    </div>
+    @endif
+
     <x-slot name="header">
     <div class="rounded-2xl p-8 
                 bg-gradient-to-r from-slate-100 via-slate-200 to-blue-100 
@@ -25,6 +34,8 @@
                     Consulta el estado de tus solicitudes, revisa avances y administra tus documentos adjuntos.
                 </p>
 
+              
+
             </div>
 
             {{-- Botones derecha --}}
@@ -36,7 +47,9 @@
                           px-6 py-3 rounded-xl 
                           font-medium shadow-sm 
                           hover:bg-slate-800 transition">
-                    + Nueva postulación
+                          @if (! auth()->user()?->becas_bloqueado)
+                            + Nueva postulación
+                            @endif
                 </a>
 
                 <a href="{{ route('student.dashboard') }}"

@@ -38,6 +38,7 @@
     <tr>
         <th>#</th>
         <th>Nombre</th>
+        <th>Tipo doc.</th>
         <th>Cédula</th>
         <th>Banco</th>
         <th>Tipo de cuenta</th>
@@ -50,6 +51,7 @@
         <tr>
             <td>{{ $p->id }}</td>
             <td>{{ $p->estudiante_nombre }}</td>
+            <td>{{ $postulacion->tipo_documento }}</td>
             <td>{{ $p->documento_identidad ?: 'N/D' }}</td>
             <td>{{ $p->banco ?: 'N/D' }}</td>
             <td>{{ $p->tipo_cuenta ?: 'N/D' }}</td>

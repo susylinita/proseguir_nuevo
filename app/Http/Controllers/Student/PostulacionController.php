@@ -9,9 +9,18 @@ use Illuminate\Support\Facades\Storage;
 
 class PostulacionController extends Controller
 {
-    public function create()
+   public function create()
     {
-        // Ya no enviamos prefill porque en la vista se muestra auth()->user() como texto
+        $user = auth()->user();
+
+        if ($user?->becas_bloqueado) {
+            return redirect()
+                ->route('student.postulaciones.index')
+                ->withErrors([
+                    'general' => 'Tu usuario se encuentra bloqueado y no puede solicitar becas. ' . ($user->becas_bloqueado_motivo ?? 'No especificado'),
+                ]);
+        }
+
         return view('student.postulaciones.create');
     }
 
@@ -30,6 +39,7 @@ if ($user->becas_bloqueado) {
         'tipo_postulacion' => ['required', 'in:primer_semestre,otro_semestre,renovacion'],
 
         'fecha_nacimiento' => ['nullable', 'date'],
+        'tipo_documento' => ['required', 'string', 'max:20'],
         'documento_identidad' => ['nullable', 'string', 'max:50'],
         'telefono_fijo' => ['nullable', 'string', 'max:30'],
         'telefono_celular' => ['required', 'string', 'max:30'],
@@ -50,10 +60,10 @@ if ($user->becas_bloqueado) {
         'cuenta_actualizada' => ['nullable'],
 
         // anexos generales (pdf/jpg/png)
-        'anexo_doc_identidad' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
-        $request->validate(['anexo_foto_documento' => ['required', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png']]),
-        'anexo_certificado_bancario' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
-
+        'anexo_doc_identidad' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
+        'anexo_foto_documento' => ['nullable', 'file', 'max:5120', 'mimetypes:image/jpeg,image/png'],
+        'anexo_certificado_bancario' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream,image/jpeg,image/png'],
+        
         'promedio_carrera' => ['nullable', 'numeric', 'min:0', 'max:5'],
 
         'pdf_notas' => ['nullable', 'file', 'max:5120', 'mimetypes:application/pdf,application/x-pdf,application/octet-stream'],
@@ -97,12 +107,34 @@ if ($user->becas_bloqueado) {
             'numero_cuenta' => ['required', 'string', 'max:50'],
         ];
     } else { // renovacion
-        $extraRules = [
-            'pdf_notas' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf'],
-            'pdf_matricula' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf'],
+    $extraRules = [
+        'anexo_certificado_notas' => [
+            'required',
+            'file',
+            'max:5120',
+            'mimes:pdf,jpg,jpeg,png',
+        ],
 
-        ];
-    }
+        'anexo_recibo_matricula' => [
+            'required',
+            'file',
+            'max:5120',
+            'mimes:pdf,jpg,jpeg,png',
+        ],
+
+        'anexo_certificado_bancario' => [
+            $request->boolean('cuenta_actualizada') ? 'required' : 'nullable',
+            'file',
+            'max:5120',
+            'mimes:pdf,jpg,jpeg,png',
+        ],
+
+        'banco' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'string', 'max:80'],
+        'titular_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'string', 'max:120'],
+        'tipo_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'in:Ahorros,Corriente'],
+        'numero_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'string', 'max:50'],
+    ];
+}
 
     $data = $request->validate($baseRules + $extraRules);
 
@@ -198,6 +230,7 @@ if ($user->becas_bloqueado) {
 
         // datos personales
         'fecha_nacimiento' => ['nullable', 'date'],
+        'tipo_documento' => ['required', 'string', 'max:20'],
         'documento_identidad' => ['nullable', 'string', 'max:50'],
         'telefono_fijo' => ['nullable', 'string', 'max:30'],
         'telefono_celular' => ['required', 'string', 'max:30'],
@@ -244,11 +277,18 @@ if ($user->becas_bloqueado) {
             'semestre_en_curso' => ['required', 'integer', 'min:1', 'max:12'],
         ];
     } else { // renovacion
-        $extraRules = [
-            'anexo_certificado_notas' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
-            'anexo_recibo_matricula' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
-        ];
-    }
+    $extraRules = [
+        'anexo_certificado_notas' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+        'anexo_recibo_matricula' => ['nullable', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
+
+        'anexo_certificado_bancario' => [
+            $request->boolean('cuenta_actualizada') ? 'required' : 'nullable',
+            'file',
+            'max:5120',
+            'mimes:pdf,jpg,jpeg,png',
+        ],
+    ];
+}
 
     $data = $request->validate($baseRules + ($extraRules ?? []));
 
@@ -323,9 +363,16 @@ if ($user->becas_bloqueado) {
 
     // Si es renovación y NO marcó cuenta_actualizada, no actualices campos bancarios
     if ($tipo === 'renovacion' && ! $request->boolean('cuenta_actualizada')) {
-        unset($data['banco'], $data['titular_cuenta'], $data['tipo_cuenta'], $data['numero_cuenta']);
-        $data['cuenta_actualizada'] = false;
-    }
+    unset(
+        $data['banco'],
+        $data['titular_cuenta'],
+        $data['tipo_cuenta'],
+        $data['numero_cuenta'],
+        $data['anexo_certificado_bancario']
+    );
+
+    $data['cuenta_actualizada'] = false;
+}
 
     $postulacion->update($data);
 
@@ -341,6 +388,7 @@ if ($user->becas_bloqueado) {
 
     $allowed = [
         'anexo_doc_identidad',
+        'anexo_foto_documento',
         'anexo_certificado_bancario',
         'anexo_certificado_notas',
         'anexo_recibo_matricula',

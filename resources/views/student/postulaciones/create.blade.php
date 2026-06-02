@@ -139,6 +139,30 @@
                                 </div>
 
                                 <div>
+                        <label for="tipo_documento" class="block text-sm font-medium text-gray-700">
+                            Tipo de documento
+                        </label>
+
+                        <select
+                            id="tipo_documento"
+                            name="tipo_documento"
+                            required
+                            class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                        >
+                            <option value="">Seleccione una opción</option>
+                            <option value="CC" {{ old('tipo_documento') == 'CC' ? 'selected' : '' }}>Cédula de ciudadanía</option>
+                            <option value="TI" {{ old('tipo_documento') == 'TI' ? 'selected' : '' }}>Tarjeta de identidad</option>
+                            <option value="CE" {{ old('tipo_documento') == 'CE' ? 'selected' : '' }}>Cédula de extranjería</option>
+                            <option value="PAS" {{ old('tipo_documento') == 'PAS' ? 'selected' : '' }}>Pasaporte</option>
+                            <option value="RC" {{ old('tipo_documento') == 'RC' ? 'selected' : '' }}>Registro civil</option>
+                        </select>
+
+                        @error('tipo_documento')
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                                <div>
                                     <label class="block text-sm font-medium text-gray-700">Número de documento</label>
                                     <input name="documento_identidad" type="text"
                                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
@@ -217,7 +241,7 @@
                             </div>
 
                             {{-- Primer semestre --}}
-                            <div x-show="tipo === 'primer_semestre'" x-cloak class="space-y-4">
+                            <div x-show="tipo == 'primer_semestre'" x-cloak class="space-y-4">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Universidad a la que quiere aplicar</label>
@@ -239,7 +263,7 @@
                             </div>
 
                             {{-- Otro semestre (estudiante activo) --}}
-                            <div x-show="tipo === 'otro_semestre'" x-cloak class="space-y-4">
+                            <div x-show="tipo == 'otro_semestre'" x-cloak class="space-y-4">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700">Universidad (opcional)</label>
@@ -268,25 +292,13 @@
                             </div>
 
                             {{-- Renovación --}}
-                            <div x-show="tipo === 'renovacion'" x-cloak class="space-y-4">
+                            <div x-show="tipo == 'renovacion'" x-cloak class="space-y-4">
                                 <p class="text-sm text-gray-700">
                                     Para renovación, sube únicamente: <strong>certificado de notas</strong> y <strong>recibo de matrícula</strong>.
                                     Si cambiaste la cuenta bancaria, actívalo y actualiza los datos.
                                 </p>
 
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Certificado de notas (PDF/JPG)</label>
-                                        <input name="anexo_certificado_notas" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
-                                               class="mt-1 block w-full text-sm text-gray-700">
-                                    </div>
-
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700">Recibo matrícula (PDF/JPG)</label>
-                                        <input name="anexo_recibo_matricula" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
-                                               class="mt-1 block w-full text-sm text-gray-700">
-                                    </div>
-                                </div>
+        
 
                                 <label class="inline-flex items-center text-sm text-gray-700">
                                     <input type="checkbox" name="cuenta_actualizada" value="1"
@@ -342,89 +354,200 @@
 
                             <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-4"
                                  x-show="tipo !== 'renovacion' || cuentaActualizada" x-cloak>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Certificado cuenta (PDF/JPG)</label>
-                                    <input name="anexo_certificado_bancario" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
-                                           class="mt-1 block w-full text-sm text-gray-700">
-                                </div>
+                               
                             </div>
                         </div>
 
                                         {{-- Pregunta abierta --}}
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
-                                Información adicional
-                            </div>
+<div class="rounded-md border border-gray-200 p-4">
+    <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+        <span x-show="tipo == 'renovacion'" x-cloak>
+            Recomendación para la fundación o sugerencia
+        </span>
 
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700">
-                                    ¿Cómo encontraron la Fundación Proseguir?
-                                </label>
-                                <textarea name="como_encontro" rows="3"
-                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                          placeholder="Cuéntanos brevemente...">{{ old('como_encontro') }}</textarea>
-                            </div>
-                        </div>
+        <span x-show="tipo != 'renovacion'" x-cloak>
+            Información adicional
+        </span>
+    </div>
 
-                        {{-- Anexos (primera vez) --}}
-                        <div class="rounded-md border border-gray-200 p-4"
-                             x-show="tipo !== 'renovacion'" x-cloak>
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
-                                Anexos (primera vez)
-                            </div>
+    <div>
+        <label class="block text-sm font-medium text-gray-700">
+            <span x-show="tipo == 'renovacion'" x-cloak>
+                Recomendación para la fundación o sugerencia
+            </span>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Documento de identidad (PDF/JPG)</label>
-                                    <input name="anexo_doc_identidad" type="file" accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
-                                           class="mt-1 block w-full text-sm text-gray-700">
-                                </div>
+            <span x-show="tipo != 'renovacion'" x-cloak>
+                ¿Cómo encontró la Fundación Proseguir?
+            </span>
+        </label>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Foto tipo documento (fondo blanco)</label>
-                                    <input name="anexo_foto_documento"
-                                type="file"
-                                accept=".jpg,.jpeg,.png,image/*"
-                                required
-                                class="mt-1 block w-full text-sm text-gray-700">
-                                    <p class="mt-1 text-xs text-gray-500">Esta foto la ve gerencia.</p>
-                                </div>
-                            </div>
+        <textarea
+            name="como_encontro"
+            rows="3"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+            :placeholder="tipo == 'renovacion'
+                ? 'Escribe una recomendación o sugerencia para la fundación...'
+                : 'Cuéntanos brevemente cómo encontraste la fundación...'"
+        >{{ old('como_encontro') }}</textarea>
+    </div>
+</div>
 
-                            <div class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">
-                                        Promedio de carrera (0–5)
-                                    </label>
-                                    <input name="promedio_carrera" type="number" step="0.01" min="0" max="5"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                           value="{{ old('promedio_carrera') }}">
-                                </div>
-                            </div>
-                        </div>
+{{-- Promedio de carrera --}}
+<div class="rounded-md border border-gray-200 p-4" x-show="tipo != 'renovacion'" x-cloak>
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">
+                Promedio de carrera (0–5)
+            </label>
+            <input
+                name="promedio_carrera"
+                type="number"
+                step="0.01"
+                min="0"
+                max="5"
+                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                value="{{ old('promedio_carrera') }}"
+            >
+        </div>
+    </div>
+</div>
+                    
+                        {{-- Anexos --}}
+<div class="rounded-md border border-gray-200 p-4">
+    <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+        Anexos
+    </div>
 
-                        {{-- Compatibilidad con tu flujo actual (puedes eliminarlo luego) --}}
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
-                                (Temporal) Archivos actuales
-                            </div>
+    {{-- Anexos para primera vez --}}
+    <div x-show="tipo != 'renovacion'" x-cloak class="space-y-4">
+        <p class="text-sm text-gray-700">
+            Adjunta los documentos requeridos para la solicitud de beca por primera vez.
+        </p>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">PDF Notas (opcional)</label>
-                                    <input name="pdf_notas" type="file" accept=".pdf,application/pdf"
-                                           class="mt-1 block w-full text-sm text-gray-700">
-                                </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    Documento de identidad (PDF/JPG)
+                </label>
+                <input
+                    name="anexo_doc_identidad"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
+                    class="mt-1 block w-full text-sm text-gray-700"
+                >
+            </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">PDF Matrícula (opcional)</label>
-                                    <input name="pdf_matricula" type="file" accept=".pdf,application/pdf"
-                                           class="mt-1 block w-full text-sm text-gray-700">
-                                </div>
-                            </div>
-                        </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    Foto tipo documento (fondo blanco)
+                </label>
+                <input
+                    name="anexo_foto_documento"
+                    type="file"
+                    accept=".jpg,.jpeg,.png,image/*"
+                    class="mt-1 block w-full text-sm text-gray-700"
+                >
+                <p class="mt-1 text-xs text-gray-500">
+                    Esta foto la ve gerencia.
+                </p>
+            </div>
 
-                        <div class="mt-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    Certificado cuenta bancaria (PDF/JPG)
+                </label>
+                <input
+                    name="anexo_certificado_bancario"
+                    type="file"
+                    accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
+                    class="mt-1 block w-full text-sm text-gray-700"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    PDF Notas
+                </label>
+                <input
+                    name="pdf_notas"
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    class="mt-1 block w-full text-sm text-gray-700"
+                >
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700">
+                    PDF Matrícula
+                </label>
+                <input
+                    name="pdf_matricula"
+                    type="file"
+                    accept=".pdf,application/pdf"
+                    class="mt-1 block w-full text-sm text-gray-700"
+                >
+            </div>
+        </div>
+    </div>
+
+    {{-- Anexos para renovación --}}
+<div x-show="tipo == 'renovacion'" x-cloak class="space-y-4">
+    <p class="text-sm text-gray-700">
+        Para renovación, adjunta el certificado de notas y el recibo de matrícula.
+        Si actualizaste tu cuenta bancaria, marca la opción correspondiente y adjunta el certificado bancario.
+    </p>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+            <label class="block text-sm font-medium text-gray-700">
+                Certificado de notas (PDF/JPG)
+            </label>
+            <input
+                name="anexo_certificado_notas"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
+                class="mt-1 block w-full text-sm text-gray-700"
+            >
+        </div>
+
+        <div>
+            <label class="block text-sm font-medium text-gray-700">
+                Recibo de matrícula (PDF/JPG)
+            </label>
+            <input
+                name="anexo_recibo_matricula"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
+                class="mt-1 block w-full text-sm text-gray-700"
+            >
+        </div>
+    </div>
+
+    <div class="rounded-lg border border-slate-200 bg-slate-50 p-4">
+        <label class="inline-flex items-center text-sm text-gray-700">
+            <input
+                type="checkbox"
+                name="cuenta_actualizada"
+                value="1"
+                x-model="cuentaActualizada"
+                class="rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+            >
+            <span class="ms-2">Actualicé mis datos bancarios</span>
+        </label>
+
+        <div x-show="cuentaActualizada" x-cloak class="mt-4">
+            <label class="block text-sm font-medium text-gray-700">
+                Certificado cuenta bancaria (PDF/JPG)
+            </label>
+            <input
+                name="anexo_certificado_bancario"
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png,application/pdf,image/*"
+                class="mt-1 block w-full text-sm text-gray-700"
+            >
+        </div>
+    </div>
+</div>
     <div class="form-check mt-3">
     <input 
         class="form-check-input" 

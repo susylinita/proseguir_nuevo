@@ -9,12 +9,12 @@
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
-        {{-- Email --}}
+        {{-- Email o cc--}}
         <div>
-            <x-input-label for="email" value="Correo electrónico" />
+            <x-input-label for="email" value="Correo electrónico o Cédula" />
             <x-text-input id="email"
                 class="block mt-1 w-full"
-                type="email"
+                type="text"
                 name="email"
                 :value="old('email')"
                 required autofocus />

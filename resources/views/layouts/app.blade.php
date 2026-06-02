@@ -29,10 +29,19 @@
             </header>
         @endif
 
+       
+
         {{-- Contenido --}}
         <main class="page-wrap">
             {{ $slot }}
         </main>
+
+        {{-- Pie de ayuda / contacto --}}
+        @if (request()->is('mi-portal/*'))
+            <footer class="page-wrap pb-8 pt-6">
+                <x-student.contact-support />
+            </footer>
+        @endif
 
     </div>
 

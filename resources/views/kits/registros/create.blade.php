@@ -108,17 +108,33 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-slate-700">
-                                        Línea de negocio
-                                    </label>
-                                    <input name="linea_negocio" type="text" required
-                                           value="{{ old('linea_negocio') }}"
-                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
-                                </div>
+    <label for="linea_negocio" class="block text-sm font-medium text-gray-700">
+        Línea de negocio
+    </label>
+
+    <select
+        id="linea_negocio"
+        name="linea_negocio"
+        required
+        class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+    >
+        <option value="">Seleccione una opción</option>
+        <option value="PROSEGUIR SAS" {{ old('linea_negocio') == 'PROSEGUIR SAS' ? 'selected' : '' }}>PROSEGUIR SAS</option>
+        <option value="PROSEGUIR SOLUCIONES DE LIQUIDEZ SAS" {{ old('linea_negocio') == 'PROSEGUIR SOLUCIONES DE LIQUIDEZ SAS' ? 'selected' : '' }}>PROSEGUIR SOLUCIONES DE LIQUIDEZ SAS</option>
+        <option value="PROSEGUIR INMOBILIARIA SAS" {{ old('linea_negocio') == 'PROSEGUIR INMOBILIARIA SAS' ? 'selected' : '' }}>PROSEGUIR INMOBILIARIA SAS</option>
+        <option value="SITEI SAS" {{ old('linea_negocio') == 'SITEI SAS' ? 'selected' : '' }}>SITEI SAS</option>
+        <option value="SMART GAME SG SAS" {{ old('linea_negocio') == 'SMART GAME SG SAS' ? 'selected' : '' }}>SMART GAME SG SAS</option>
+        <option value="EVOLUCIÓN INTELIGENTE SAS" {{ old('linea_negocio') == 'EVOLUCIÓN INTELIGENTE SAS' ? 'selected' : '' }}>EVOLUCIÓN INTELIGENTE SAS</option>
+    </select>
+
+    @error('linea_negocio')
+        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+    @enderror
+</div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">
-                                        Área
+                                        Cargo
                                     </label>
                                     <input name="area" type="text" required
                                            value="{{ old('area') }}"
@@ -147,14 +163,7 @@
                                            class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
                                 </div>
 
-                                <div>
-                                    <label class="block text-sm font-medium text-slate-700">
-                                        Documento
-                                    </label>
-                                    <input name="nino_documento" type="text" required
-                                           value="{{ old('nino_documento') }}"
-                                           class="mt-2 w-full rounded-xl border border-slate-300 px-4 py-3 text-sm focus:border-indigo-600 focus:ring-1 focus:ring-indigo-600 transition">
-                                </div>
+                            
 
                                 <div>
                                     <label class="block text-sm font-medium text-slate-700">

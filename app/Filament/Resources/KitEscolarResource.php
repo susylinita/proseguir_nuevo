@@ -37,26 +37,35 @@ class KitEscolarResource extends Resource
                     ->relationship('user', 'name') // o 'email'
                     ->searchable()
                     ->preload()
-                    ->required()
+                    ->nullable()
                     ->columnSpanFull(),
 
             Forms\Components\Section::make('Información del colaborador')
                 ->schema([
                     Forms\Components\TextInput::make('colaborador_nombre')
                         ->label('Nombre completo')
-                        ->required(),
+                        ->nullable(),
 
                     Forms\Components\TextInput::make('colaborador_documento')
                         ->label('Documento')
-                        ->required(),
+                        ->nullable(),
 
-                    Forms\Components\TextInput::make('linea_negocio')
-                        ->label('Línea de negocio')
-                        ->required(),
+                    Forms\Components\Select::make('linea_negocio')
+                    ->label('Línea de negocio')
+                    ->options([
+                        'PROSEGUIR SAS' => 'PROSEGUIR SAS',
+                        'PROSEGUIR SOLUCIONES DE LIQUIDEZ SAS' => 'PROSEGUIR SOLUCIONES DE LIQUIDEZ SAS',
+                        'PROSEGUIR INMOBILIARIA SAS' => 'PROSEGUIR INMOBILIARIA SAS',
+                        'SITEI SAS' => 'SITEI SAS',
+                        'SMART GAME SG SAS' => 'SMART GAME SG SAS',
+                        'EVOLUCIÓN INTELIGENTE SAS' => 'EVOLUCIÓN INTELIGENTE SAS',
+                    ])
+                    ->nullable()
+                    ->searchable(),
 
                     Forms\Components\TextInput::make('area')
-                        ->label('Área')
-                        ->required(),
+                        ->label('Cargo')
+                        ->nullable(),
                 ])
                 ->columns(2),
 
@@ -66,9 +75,6 @@ class KitEscolarResource extends Resource
                         ->label('Nombre completo')
                         ->required(),
 
-                    Forms\Components\TextInput::make('nino_documento')
-                        ->label('Documento')
-                        ->required(),
 
                     Forms\Components\TextInput::make('edad')
                         ->label('Edad')
@@ -109,6 +115,12 @@ class KitEscolarResource extends Resource
                     ->label('Colaborador')
                     ->searchable()
                     ->sortable(),
+
+                Tables\Columns\TextColumn::make('linea_negocio')
+                    ->label('Línea de negocio')
+                    ->searchable()
+                    ->sortable()
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('nino_nombre')
                     ->label('Niño')
@@ -219,7 +231,7 @@ class KitEscolarResource extends Resource
                         ->label('Línea de negocio'),
 
                     Infolists\Components\TextEntry::make('area')
-                        ->label('Área'),
+                        ->label('Cargo'),
                 ])
                 ->columns(2),
 

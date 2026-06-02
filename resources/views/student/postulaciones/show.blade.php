@@ -1,91 +1,89 @@
 <x-app-layout>
     <x-slot name="header">
-    <div class="rounded-2xl p-8 
-                bg-gradient-to-r from-slate-100 via-slate-200 to-emerald-100 
-                border border-slate-200 shadow-sm">
+        <div class="rounded-2xl p-8 
+                    bg-gradient-to-r from-slate-100 via-slate-200 to-emerald-100 
+                    border border-slate-200 shadow-sm">
 
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
 
-            {{-- Lado izquierdo --}}
-            <div>
+                {{-- Lado izquierdo --}}
+                <div>
+                    <div class="inline-flex items-center gap-2 
+                                px-4 py-1.5 rounded-full 
+                                bg-white/70 backdrop-blur 
+                                border border-slate-300 
+                                text-xs font-medium text-slate-700 shadow-sm">
+                        📄 Postulación
+                    </div>
 
-                {{-- Badge superior --}}
-                <div class="inline-flex items-center gap-2 
-                            px-4 py-1.5 rounded-full 
-                            bg-white/70 backdrop-blur 
-                            border border-slate-300 
-                            text-xs font-medium text-slate-700 shadow-sm">
-                    📄 Postulación
+                    <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
+                        Detalle de postulación 
+                        <span class="text-slate-600">#{{ $postulacion->id }}</span>
+                    </h1>
+
+                    <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
+                        Revisa el estado actual, los documentos cargados y el historial
+                        de movimientos de tu postulación.
+                    </p>
+
+                    <p class="mt-3 text-sm text-slate-500">
+                        Última actualización:
+                        {{ optional($postulacion->updated_at)->timezone('America/Bogota')->format('Y-m-d H:i') }}
+                    </p>
                 </div>
 
-                {{-- Título --}}
-                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
-                    Detalle de postulación 
-                    <span class="text-slate-600">#{{ $postulacion->id }}</span>
-                </h1>
+                {{-- Botones derecha --}}
+                <div class="flex flex-wrap items-center gap-4">
 
-                {{-- Descripción --}}
-                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
-                    Revisa el estado actual, los documentos cargados y el historial
-                    de movimientos de tu postulación.
-                </p>
-
-                {{-- Fecha --}}
-                <p class="mt-3 text-sm text-slate-500">
-                    Última actualización:
-                    {{ optional($postulacion->updated_at)->format('Y-m-d H:i') }}
-                </p>
-            </div>
-
-            {{-- Botones derecha --}}
-            <div class="flex flex-wrap items-center gap-4">
-
-                <a href="{{ route('student.postulaciones.index') }}"
-                   class="inline-flex items-center gap-2 
-                          bg-blue-600 text-white 
-                          px-6 py-3 rounded-xl 
-                          font-semibold shadow-md 
-                          hover:bg-blue-700 transition">
-                    Ver mis postulaciones
-                </a>
-
-                <a href="{{ route('student.dashboard') }}"
-                   class="inline-flex items-center gap-2 
-                          bg-white border border-slate-300 
-                          text-slate-700 px-6 py-3 
-                          rounded-xl font-medium 
-                          hover:bg-slate-50 transition">
-                    Volver al dashboard
-                </a>
-
-                @if (($postulacion->estado ?? '') === 'Pendiente')
-                    <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
+                    <a href="{{ route('student.postulaciones.index') }}"
                        class="inline-flex items-center gap-2 
-                              bg-slate-900 text-white 
+                              bg-blue-600 text-white 
                               px-6 py-3 rounded-xl 
                               font-semibold shadow-md 
-                              hover:bg-slate-800 transition">
-                        Editar
+                              hover:bg-blue-700 transition">
+                        Ver mis postulaciones
                     </a>
-                @endif
+
+                    <a href="{{ route('student.dashboard') }}"
+                       class="inline-flex items-center gap-2 
+                              bg-white border border-slate-300 
+                              text-slate-700 px-6 py-3 
+                              rounded-xl font-medium 
+                              hover:bg-slate-50 transition">
+                        Volver al dashboard
+                    </a>
+
+                    @if (($postulacion->estado ?? '') === 'Postulado')
+                        <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
+                           class="inline-flex items-center gap-2 
+                                  bg-slate-900 text-white 
+                                  px-6 py-3 rounded-xl 
+                                  font-semibold shadow-md 
+                                  hover:bg-slate-800 transition">
+                            Editar
+                        </a>
+                    @endif
+
+                </div>
 
             </div>
-
         </div>
-    </div>
-</x-slot>
-
+    </x-slot>
 
     @php
-        $estado = $postulacion->estado ?? 'N/D';
+        $estado = $postulacion->estado ?? 'Postulado';
 
-        $badge = 'bg-gray-100 text-gray-800';
-        if ($estado === 'Pendiente') $badge = 'bg-yellow-100 text-yellow-800';
-        if ($estado === 'Entrevista') $badge = 'bg-blue-100 text-blue-800';
-        if ($estado === 'Aprobado') $badge = 'bg-green-100 text-green-800';
-        if ($estado === 'Rechazado') $badge = 'bg-red-100 text-red-800';
+        $badge = match ($estado) {
+            'Postulado' => 'bg-slate-100 text-slate-800',
+            'En estudio' => 'bg-blue-100 text-blue-800',
+            'Aprobado' => 'bg-green-100 text-green-800',
+            'Rechazado' => 'bg-red-100 text-red-800',
+            'Cancelado' => 'bg-gray-100 text-gray-700',
+            default => 'bg-gray-100 text-gray-800',
+        };
 
         $tipo = $postulacion->tipo_postulacion ?? 'primer_semestre';
+
         $tipoLabel = match ($tipo) {
             'primer_semestre' => 'Ingreso a primer semestre (primera vez)',
             'otro_semestre' => 'Ingreso a otro semestre (primera vez)',
@@ -93,34 +91,59 @@
             default => 'N/D',
         };
 
-        // Pendientes (según tipo)
+        // Pendientes según tipo de postulación
         $pendientes = [];
 
         if ($tipo === 'renovacion') {
-            if (empty($postulacion->anexo_certificado_notas)) $pendientes[] = 'Certificado de notas';
-            if (empty($postulacion->anexo_recibo_matricula)) $pendientes[] = 'Recibo de matrícula';
+            if (empty($postulacion->anexo_certificado_notas)) {
+                $pendientes[] = 'Certificado de notas';
+            }
+
+            if (empty($postulacion->anexo_recibo_matricula)) {
+                $pendientes[] = 'Recibo de matrícula';
+            }
+
+            if (($postulacion->cuenta_actualizada ?? false) && empty($postulacion->anexo_certificado_bancario)) {
+                $pendientes[] = 'Certificado cuenta bancaria';
+            }
         } else {
-            if (empty($postulacion->anexo_doc_identidad)) $pendientes[] = 'Documento de identidad';
-            if (empty($postulacion->anexo_foto_documento)) $pendientes[] = 'Foto tipo documento';
-            if (empty($postulacion->anexo_certificado_bancario)) $pendientes[] = 'Certificado cuenta bancaria';
-            if (is_null($postulacion->promedio_carrera)) $pendientes[] = 'Promedio de carrera';
+            if (empty($postulacion->anexo_doc_identidad)) {
+                $pendientes[] = 'Documento de identidad';
+            }
+
+            if (empty($postulacion->anexo_foto_documento)) {
+                $pendientes[] = 'Foto tipo documento';
+            }
+
+            if (empty($postulacion->anexo_certificado_bancario)) {
+                $pendientes[] = 'Certificado cuenta bancaria';
+            }
+
+            if (is_null($postulacion->promedio_carrera)) {
+                $pendientes[] = 'Promedio de carrera';
+            }
         }
 
-        // Etapas para timeline visual
-        $etapas = ['Pendiente', 'Entrevista', 'Aprobado'];
-        $rechazada = ($estado === 'Rechazado');
+        // Timeline visual con nuevos estados
+        if ($estado === 'Rechazado') {
+            $etapas = ['Postulado', 'En estudio', 'Rechazado'];
+        } elseif ($estado === 'Cancelado') {
+            $etapas = ['Postulado', 'Cancelado'];
+        } else {
+            $etapas = ['Postulado', 'En estudio', 'Aprobado'];
+        }
 
         $indiceEstado = array_search($estado, $etapas, true);
-        $indiceEstado = ($indiceEstado === false) ? -1 : $indiceEstado;
+        $indiceEstado = ($indiceEstado === false) ? 0 : $indiceEstado;
 
         $generoLabel = $postulacion->genero ?: 'N/D';
 
-        // Helper para links "ver" (inline)
+        // Helper para links "ver" documentos
         $fileUrl = fn(string $field) => route('student.postulaciones.file', [$postulacion, $field]);
     @endphp
 
     <div class="py-12 bg-slate-50 min-h-screen">
-    <div class="max-w-6xl mx-auto px-6 space-y-8">
+        <div class="max-w-6xl mx-auto px-6 space-y-8">
 
             @if (session('status'))
                 <div class="rounded-md bg-green-50 p-4 text-sm text-green-700">
@@ -134,10 +157,10 @@
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                         <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                             <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Estado</div>
+                                Estado
+                            </div>
                             <div class="mt-2">
                                 <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold {{ $badge }}">
-
                                     {{ $estado }}
                                 </span>
                             </div>
@@ -145,7 +168,8 @@ Estado</div>
 
                         <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                             <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Tipo</div>
+                                Tipo
+                            </div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
                                 {{ $tipoLabel }}
                             </div>
@@ -153,15 +177,17 @@ Tipo</div>
 
                         <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                             <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Última actualización</div>
+                                Última actualización
+                            </div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
-                                {{ optional($postulacion->updated_at)->format('Y-m-d H:i') }}
+                                {{ optional($postulacion->updated_at)->timezone('America/Bogota')->format('Y-m-d H:i') }}
                             </div>
                         </div>
 
                         <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                             <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Pendientes</div>
+                                Pendientes
+                            </div>
                             <div class="mt-2 text-sm font-medium text-gray-900">
                                 {{ count($pendientes) }}
                             </div>
@@ -171,7 +197,8 @@ Pendientes</div>
                     {{-- Pendientes --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Pendientes o incompletos</div>
+                            Pendientes o incompletos
+                        </div>
 
                         @if (count($pendientes) === 0)
                             <div class="mt-2 text-sm text-green-700">
@@ -184,7 +211,7 @@ Pendientes o incompletos</div>
                                 @endforeach
                             </ul>
 
-                            @if (($postulacion->estado ?? '') === 'Pendiente')
+                            @if (($postulacion->estado ?? '') === 'Postulado')
                                 <div class="mt-3">
                                     <a href="{{ route('student.postulaciones.edit', $postulacion) }}"
                                        class="inline-flex items-center rounded-md bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700">
@@ -193,84 +220,86 @@ Pendientes o incompletos</div>
                                 </div>
                             @else
                                 <div class="mt-3 text-sm text-gray-600">
-                                    Tu postulación ya no está en Pendiente. Si necesitas actualizar, contacta a coordinación.
+                                    Esta solicitud ya inició revisión por parte de la Fundación. Si necesitas actualizar información o documentos, contacta a coordinación.
                                 </div>
                             @endif
                         @endif
                     </div>
 
                     {{-- Timeline --}}
-<div class="border border-slate-200 rounded-2xl p-8 bg-white shadow-sm">
-    <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-        Estado del proceso
-    </div>
-
-    @if ($rechazada)
-        <div class="mt-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
-            Tu postulación fue rechazada. Si necesitas aclaraciones, revisa el perfil descriptivo o contacta a la Fundación.
-        </div>
-    @endif
-
-    <div class="mt-8">
-        <ol class="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
-
-            @foreach ($etapas as $i => $etapa)
-                @php
-                    $completa = ($indiceEstado >= $i);
-                    $actual = ($estado === $etapa);
-
-                    $circle = $completa
-                        ? 'bg-slate-900 text-white'
-                        : 'bg-slate-200 text-slate-500';
-
-                    $line = $completa
-                        ? 'bg-slate-900'
-                        : 'bg-slate-200';
-                @endphp
-
-                <li class="flex-1 relative">
-
-                    <div class="flex md:flex-col items-center md:items-center gap-4">
-
-                        {{-- Círculo --}}
-                        <div class="relative z-10 flex items-center justify-center h-10 w-10 rounded-full text-sm font-semibold shadow {{ $circle }}">
-                            {{ $i + 1 }}
+                    <div class="border border-slate-200 rounded-2xl p-8 bg-white shadow-sm">
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+                            Estado del proceso
                         </div>
 
-                        {{-- Línea horizontal (desktop) --}}
-                        @if (!$loop->last)
-                            <div class="hidden md:block absolute top-5 left-1/2 w-full h-0.5 {{ $line }}"></div>
+                        @if ($estado === 'Rechazado')
+                            <div class="mt-4 rounded-lg bg-red-50 border border-red-200 p-4 text-sm text-red-700">
+                                Tu postulación fue rechazada. Si necesitas aclaraciones, revisa el perfil descriptivo o contacta a la Fundación.
+                            </div>
                         @endif
 
-                        {{-- Texto --}}
-                        <div class="text-sm font-medium {{ $completa ? 'text-slate-900' : 'text-slate-400' }}">
-                            {{ $etapa }}
+                        @if ($estado === 'Cancelado')
+                            <div class="mt-4 rounded-lg bg-slate-50 border border-slate-200 p-4 text-sm text-slate-700">
+                                Tu postulación fue cancelada y no continuará el proceso.
+                            </div>
+                        @endif
 
-                            @if ($actual)
-                                <span class="block text-xs text-slate-500 mt-1">
-                                    Etapa actual
-                                </span>
-                            @endif
+                        <div class="mt-8">
+                            <ol class="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+
+                                @foreach ($etapas as $i => $etapa)
+                                    @php
+                                        $completa = ($indiceEstado >= $i);
+                                        $actual = ($estado === $etapa);
+
+                                        $circle = match ($etapa) {
+                                            'Aprobado' => $completa ? 'bg-green-600 text-white' : 'bg-slate-200 text-slate-500',
+                                            'Rechazado' => $completa ? 'bg-red-600 text-white' : 'bg-slate-200 text-slate-500',
+                                            'Cancelado' => $completa ? 'bg-gray-600 text-white' : 'bg-slate-200 text-slate-500',
+                                            default => $completa ? 'bg-slate-900 text-white' : 'bg-slate-200 text-slate-500',
+                                        };
+
+                                        $line = $completa ? 'bg-slate-900' : 'bg-slate-200';
+                                    @endphp
+
+                                    <li class="flex-1 relative">
+
+                                        <div class="flex md:flex-col items-center md:items-center gap-4">
+
+                                            <div class="relative z-10 flex items-center justify-center h-10 w-10 rounded-full text-sm font-semibold shadow {{ $circle }}">
+                                                {{ $i + 1 }}
+                                            </div>
+
+                                            @if (!$loop->last)
+                                                <div class="hidden md:block absolute top-5 left-1/2 w-full h-0.5 {{ $line }}"></div>
+                                            @endif
+
+                                            <div class="text-sm font-medium {{ $completa ? 'text-slate-900' : 'text-slate-400' }}">
+                                                {{ $etapa }}
+
+                                                @if ($actual)
+                                                    <span class="block text-xs text-slate-500 mt-1">
+                                                        Etapa actual
+                                                    </span>
+                                                @endif
+                                            </div>
+
+                                        </div>
+
+                                    </li>
+                                @endforeach
+
+                            </ol>
                         </div>
 
+                        <p class="mt-8 text-xs text-slate-500">
+                            Las etapas pueden avanzar según revisión de coordinación y decisión de gerencia.
+                        </p>
                     </div>
-
-                </li>
-            @endforeach
-
-        </ol>
-    </div>
-
-    <p class="mt-8 text-xs text-slate-500">
-        Las etapas pueden avanzar según revisión de coordinación y aprobación de gerencia.
-    </p>
-</div>
-
 
                     {{-- Datos del estudiante + foto --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-
                             Datos del estudiante
                         </div>
 
@@ -285,14 +314,19 @@ Pendientes o incompletos</div>
 
                                     <div>
                                         <div class="text-gray-500">Email</div>
-                                        <div class="font-medium text-gray-900">{{ $postulacion->estudiante_email }}</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->estudiante_email ?: 'N/D' }}</div>
                                     </div>
 
                                     <div>
                                         <div class="text-gray-500">Fecha de nacimiento</div>
                                         <div class="font-medium text-gray-900">
-                                            {{ $postulacion->fecha_nacimiento ? $postulacion->fecha_nacimiento->format('Y-m-d') : 'N/D' }}
+                                            {{ $postulacion->fecha_nacimiento ? \Carbon\Carbon::parse($postulacion->fecha_nacimiento)->format('d/m/Y') : 'N/D' }}
                                         </div>
+                                    </div>
+
+                                    <div>
+                                        <div class="text-gray-500">Tipo de documento</div>
+                                        <div class="font-medium text-gray-900">{{ $postulacion->tipo_documento ?: 'N/D' }}</div>
                                     </div>
 
                                     <div>
@@ -348,7 +382,9 @@ Pendientes o incompletos</div>
 
                     {{-- Acudiente --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
-                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">Datos del acudiente</div>
+                        <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
+                            Datos del acudiente
+                        </div>
 
                         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
@@ -365,7 +401,8 @@ Pendientes o incompletos</div>
                     {{-- Estudios --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Estudios</div>
+                            Estudios
+                        </div>
 
                         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             @if ($tipo === 'primer_semestre')
@@ -390,10 +427,9 @@ Estudios</div>
                                     <div class="text-gray-500">Semestre en curso</div>
                                     <div class="font-medium text-gray-900">{{ $postulacion->semestre_en_curso ?: 'N/D' }}</div>
                                 </div>
-                                
                             @else
                                 <div class="sm:col-span-2 text-sm text-gray-700">
-                                    Renovación: solo se validan documentos de notas y matrícula (y cuenta bancaria si cambió).
+                                    Renovación: se validan documentos de notas, matrícula y certificado bancario si actualizó su cuenta.
                                 </div>
                             @endif
                         </div>
@@ -402,7 +438,8 @@ Estudios</div>
                     {{-- Datos bancarios --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Datos bancarios</div>
+                            Datos bancarios
+                        </div>
 
                         <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                             <div>
@@ -436,7 +473,8 @@ Datos bancarios</div>
                     {{-- Información adicional --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Información adicional</div>
+                            Información adicional
+                        </div>
                         <div class="mt-2 text-sm text-gray-800 whitespace-pre-line">
                             {{ $postulacion->como_encontro ?: 'Sin respuesta.' }}
                         </div>
@@ -445,13 +483,14 @@ Información adicional</div>
                     {{-- Perfil descriptivo --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Perfil descriptivo (coordinación)</div>
+                            Perfil descriptivo (coordinación)
+                        </div>
                         <div class="mt-2 text-sm text-gray-800 whitespace-pre-line">
                             {{ $postulacion->perfil_descriptivo ?? 'Aún no hay perfil descriptivo registrado.' }}
                         </div>
                     </div>
 
-                    {{-- Documentos (INLINE, no descarga) --}}
+                    {{-- Documentos --}}
                     <div class="border border-slate-200 rounded-xl p-6 bg-white shadow-sm">
                         <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
                             Documentos
@@ -460,16 +499,21 @@ Perfil descriptivo (coordinación)</div>
                         <div class="space-y-4 text-sm">
 
                             @php
-                                $docs = [
-                                    ['label' => 'Documento de identidad', 'field' => 'anexo_doc_identidad'],
-                                    ['label' => 'Certificado bancario', 'field' => 'anexo_certificado_bancario'],
-                                    ['label' => 'Notas académicas', 'field' => 'pdf_notas'],
-                                    ['label' => 'Recibo de matrícula', 'field' => 'pdf_matricula'],
-                                ];
+                                $docs = [];
 
-                                if ($tipo === 'renovacion') {
-                                    $docs[] = ['label' => 'Certificado de notas (renovación)', 'field' => 'anexo_certificado_notas'];
-                                    $docs[] = ['label' => 'Recibo matrícula (renovación)', 'field' => 'anexo_recibo_matricula'];
+                                if ($tipo !== 'renovacion') {
+                                    $docs[] = ['label' => 'Documento de identidad', 'field' => 'anexo_doc_identidad'];
+                                    $docs[] = ['label' => 'Foto tipo documento', 'field' => 'anexo_foto_documento'];
+                                    $docs[] = ['label' => 'Certificado bancario', 'field' => 'anexo_certificado_bancario'];
+                                    $docs[] = ['label' => 'Notas académicas', 'field' => 'pdf_notas'];
+                                    $docs[] = ['label' => 'Recibo de matrícula', 'field' => 'pdf_matricula'];
+                                } else {
+                                    $docs[] = ['label' => 'Certificado de notas', 'field' => 'anexo_certificado_notas'];
+                                    $docs[] = ['label' => 'Recibo matrícula', 'field' => 'anexo_recibo_matricula'];
+
+                                    if ($postulacion->cuenta_actualizada) {
+                                        $docs[] = ['label' => 'Certificado bancario', 'field' => 'anexo_certificado_bancario'];
+                                    }
                                 }
                             @endphp
 
@@ -508,7 +552,8 @@ Perfil descriptivo (coordinación)</div>
                 <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
                     <div class="p-6 text-gray-900">
                         <div class="text-xs font-semibold tracking-widest text-slate-500 uppercase">
-Historial de cambios</div>
+                            Historial de cambios
+                        </div>
 
                         @if ($postulacion->historicoEstados->isEmpty())
                             <div class="mt-3 text-sm text-gray-600">No hay historial registrado.</div>

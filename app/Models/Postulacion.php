@@ -16,6 +16,7 @@ class Postulacion extends Model
         'estudiante_nombre',
         'estudiante_email',
         'fecha_nacimiento',
+        'tipo_documento',
         'documento_identidad',
         'telefono_fijo',
         'telefono_celular',
@@ -49,7 +50,11 @@ class Postulacion extends Model
         'anexo_certificado_notas',
         'anexo_recibo_matricula',
 
-        'observaciones_entrevista',
+        'entrevista_observaciones',
+        'entrevista_recomendado',
+        'entrevista_semaforo',
+        'entrevista_registrada_por',
+        'entrevista_registrada_en',
 
         // existentes
         'puntaje_saber',
@@ -61,11 +66,16 @@ class Postulacion extends Model
 
         'acepta_politica',
         'fecha_aceptacion_politica',
+
+        'gerencia_observaciones',
+        'gerencia_observaciones_por',
+        'gerencia_observaciones_en',
     ];
 
     protected $casts = [
-        'fecha_nacimiento' => 'date',
-        'cuenta_actualizada' => 'boolean',
+    'entrevista_recomendado' => 'boolean',
+    'entrevista_registrada_en' => 'datetime',
+    'gerencia_observaciones_en' => 'datetime',
     ];
 
     public function user()

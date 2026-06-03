@@ -1,26 +1,43 @@
 <x-filament-panels::page.simple>
-    <div class="mb-6">
-        <h2 class="text-xl font-bold text-slate-900">
-            Acceso administrativo
-        </h2>
-        <p class="mt-1 text-sm text-slate-600">
-            Inicia sesión para gestionar postulaciones, kits, aprobaciones y reportes.
-        </p>
-    </div>
+    <div class="fp-login-page">
+        <div class="fp-login-card">
+            <div class="fp-login-left">
+                <div class="fp-login-badge">Panel Administrativo</div>
 
-    <x-filament-panels::form wire:submit="authenticate">
-        {{ $this->form }}
+                <h1>Fundación Proseguir</h1>
 
-        <x-filament-panels::form.actions
-            :actions="$this->getCachedFormActions()"
-            :full-width="true"
-        />
-    </x-filament-panels::form>
+                <p>
+                    Gestiona postulaciones, becas, kits escolares, usuarios,
+                    aprobaciones y reportes desde un solo lugar.
+                </p>
 
-    <div class="mt-4 text-center text-sm text-slate-600">
-        ¿Eres postulante o acudiente?
-        <a href="{{ url('/') }}" class="font-semibold text-blue-800 hover:text-blue-900">
-            Ingresa desde el portal
-        </a>
+                <ul>
+                    <li>Control de postulaciones</li>
+                    <li>Seguimiento por estados</li>
+                    <li>Aprobación de gerencia</li>
+                </ul>
+            </div>
+
+            <div class="fp-login-right">
+                <div class="fp-login-logo">
+                    <img src="{{ asset('images/logo-proseguir.png') }}" alt="Fundación Proseguir">
+                </div>
+
+                <h2>Acceso administrativo</h2>
+
+                <p class="fp-login-subtitle">
+                    Ingresa tus credenciales para continuar.
+                </p>
+
+                <x-filament-panels::form wire:submit="authenticate">
+                    {{ $this->form }}
+
+                    <x-filament-panels::form.actions
+                        :actions="$this->getCachedFormActions()"
+                        :full-width="$this->hasFullWidthFormActions()"
+                    />
+                </x-filament-panels::form>
+            </div>
+        </div>
     </div>
 </x-filament-panels::page.simple>

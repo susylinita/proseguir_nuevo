@@ -23,6 +23,7 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Enums\ActionsPosition;
+use App\Support\BankOptions;
 
 class PostulacionResource extends Resource
 {
@@ -69,272 +70,362 @@ public static function canDelete($record): bool
 }
 
     public static function form(Form $form): Form
-    {
-        return $form->schema([
-
-            Forms\Components\Section::make('Usuario asociado')
-    ->schema([
-        Forms\Components\Select::make('user_id')
-            ->label('Asignar a usuario existente')
-            ->placeholder('Seleccione un usuario existente')
-            ->helperText('Seleccione un usuario existente si esta postulación pertenece a un becado ya creado.')
-            ->options(function () {
-                return \App\Models\User::query()
-                    ->where('portal', 'postulantes')
-                    ->orderBy('name')
-                    ->get()
-                    ->mapWithKeys(function ($user) {
-                        $label = $user->name ?: 'Usuario sin nombre';
-
-                        if ($user->cedula) {
-                            $label .= ' - Doc: ' . $user->cedula;
-                        }
-
-                        if ($user->email) {
-                            $label .= ' - ' . $user->email;
-                        }
-
-                        return [$user->id => $label];
-                    })
-                    ->toArray();
-            })
-            ->native(true)
-            ->nullable()
-            ->live()
-            ->afterStateUpdated(function ($state, callable $set) {
-                if (! $state) {
-                    return;
-                }
-
-                $user = \App\Models\User::find($state);
-
-                if (! $user) {
-                    return;
-                }
-
-                $set('estudiante_nombre', $user->name);
-                $set('estudiante_email', $user->email);
-                $set('documento_identidad', $user->cedula);
-                $set('tipo_documento', $user->tipo_documento);
-            }),
-    ])
-    ->columns(1),
-
-    
-            Forms\Components\Section::make('Datos del Postulante')
+    {return $form->schema([
+    Forms\Components\Tabs::make('Formulario de postulación')
+        ->tabs([
+            Forms\Components\Tabs\Tab::make('Usuario')
+                ->icon('heroicon-o-user-circle')
                 ->schema([
-                    Forms\Components\Select::make('tipo_postulacion')
-                        ->label('Tipo de postulación')
-                        ->options([
-                            'primer_semestre' => 'Ingreso a primer semestre (primera vez)',
-                            'otro_semestre' => 'Ingreso a otro semestre (primera vez)',
-                            'renovacion' => 'Renovación (ya becado)',
-                            'becado_actual' => 'Becado actual',
+                    Forms\Components\Section::make('Usuario asociado')
+                        ->description('Seleccione un usuario existente cuando la postulación pertenezca a un becado ya creado.')
+                        ->schema([
+                            Forms\Components\Select::make('user_id')
+                                ->label('Asignar a usuario existente')
+                                ->placeholder('Seleccione un usuario existente')
+                                ->helperText('Seleccione un usuario existente si esta postulación pertenece a un becado ya creado.')
+                                ->options(function () {
+                                    return \App\Models\User::query()
+                                        ->where('portal', 'postulantes')
+                                        ->orderBy('name')
+                                        ->get()
+                                        ->mapWithKeys(function ($user) {
+                                            $label = $user->name ?: 'Usuario sin nombre';
+
+                                            if ($user->cedula) {
+                                                $label .= ' - Doc: ' . $user->cedula;
+                                            }
+
+                                            if ($user->email) {
+                                                $label .= ' - ' . $user->email;
+                                            }
+
+                                            return [$user->id => $label];
+                                        })
+                                        ->toArray();
+                                })
+                                ->native(true)
+                                ->nullable()
+                                ->live()
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    if (! $state) {
+                                        return;
+                                    }
+
+                                    $user = \App\Models\User::find($state);
+
+                                    if (! $user) {
+                                        return;
+                                    }
+
+                                    $set('estudiante_nombre', $user->name);
+                                    $set('estudiante_email', $user->email);
+                                    $set('documento_identidad', $user->cedula);
+                                    $set('tipo_documento', $user->tipo_documento);
+                                }),
                         ])
-                        ->required()
-                        ->live(),
-
-                    Forms\Components\TextInput::make('estudiante_nombre')
-                        ->label('Nombre completo')
-                        ->required()
-                        ->maxLength(255),
-
-                    Forms\Components\TextInput::make('estudiante_email')
-                        ->label('Correo electrónico')
-                        ->required()
-                        ->email()
-                        ->nullable()
-                        ->maxLength(255),
-
-                    Forms\Components\DatePicker::make('fecha_nacimiento')
-                        ->label('Fecha de nacimiento'),
-
-                    Forms\Components\Select::make('tipo_documento')
-                        ->label('Tipo de documento')
-                        ->options([
-                            'CC' => 'Cédula de ciudadanía',
-                            'TI' => 'Tarjeta de identidad',
-                            'CE' => 'Cédula de extranjería',
-                            'PAS' => 'Pasaporte',
-                            'RC' => 'Registro civil',
-                        ])
-                        ->required()
-                        ->searchable(),
-
-                    Forms\Components\TextInput::make('documento_identidad')
-                        ->label('Número de documento')
-                        ->required()
-                        ->maxLength(50),
-
-                    Forms\Components\TextInput::make('clave_usuario')
-                        ->label('Clave de acceso del postulante')
-                        ->password()
-                        ->revealable()
-                        ->required(fn (string $operation): bool => $operation === 'create')
-                        ->dehydrated(false)
-                        ->visible(fn () => auth()->user()?->hasRole('admin') ?? false),
-
-                    Forms\Components\TextInput::make('telefono_celular')
-                        ->label('Teléfono celular')
-                        ->maxLength(30),
-
-                    Forms\Components\TextInput::make('telefono_fijo')
-                        ->label('Teléfono fijo')
-                        ->maxLength(30),
-
-                    Forms\Components\TextInput::make('direccion')
-                        ->label('Dirección')
-                        ->maxLength(120),
-
-                    Forms\Components\TextInput::make('barrio')
-                        ->label('Barrio')
-                        ->maxLength(80),
-
-                    Forms\Components\Select::make('genero')
-                        ->label('Género')
-                        ->options([
-                            'F' => 'F',
-                            'M' => 'M',
-                            'Otro' => 'Otro',
-                            'Prefiero no decir' => 'Prefiero no decir',
-                        ]),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make('Puntajes')
-                ->schema([
-                    Forms\Components\TextInput::make('puntaje_saber')
-                        ->label('Puntaje Saber 11')
-                        ->numeric()
-                        ->required(),
-
-                    Forms\Components\TextInput::make('promedio_universitario')
-                        ->label('Promedio acumulado')
-                        ->numeric()
-                        ->step(0.1)
-                        ->required(),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make('Acudiente')
-                ->schema([
-                    Forms\Components\TextInput::make('nombre_acudiente')
-                        ->label('Nombre acudiente')
-                        ->maxLength(120),
-
-                    Forms\Components\TextInput::make('telefono_acudiente')
-                        ->label('Teléfono acudiente')
-                        ->maxLength(30),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make('Estudios')
-                ->schema([
-                    Forms\Components\TextInput::make('universidad_aplica')
-                        ->label('Universidad a la que aplica')
-                        ->maxLength(160)
-                        ->visible(fn ($get) => $get('tipo_postulacion') === 'primer_semestre'),
-
-                    Forms\Components\TextInput::make('carrera_aplica')
-                        ->label('Carrera a la que aplica')
-                        ->maxLength(160)
-                        ->visible(fn ($get) => $get('tipo_postulacion') === 'primer_semestre'),
-
-                    Forms\Components\TextInput::make('universidad_actual')
-                        ->label('Universidad actual')
-                        ->maxLength(160)
-                        ->visible(fn ($get) => $get('tipo_postulacion') === 'otro_semestre'),
-
-                    Forms\Components\TextInput::make('carrera_actual')
-                        ->label('Carrera actual')
-                        ->maxLength(160)
-                        ->visible(fn ($get) => $get('tipo_postulacion') === 'otro_semestre'),
-
-                    Forms\Components\TextInput::make('semestre_en_curso')
-                        ->label('Semestre en curso')
-                        ->numeric()
-                        ->minValue(1)
-                        ->maxValue(12)
-                        ->visible(fn ($get) => $get('tipo_postulacion') === 'otro_semestre'),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make('Datos bancarios')
-                ->schema([
-                    Forms\Components\TextInput::make('banco')
-                        ->label('Banco')
-                        ->maxLength(80),
-
-                    Forms\Components\TextInput::make('titular_cuenta')
-                        ->label('Titular de la cuenta')
-                        ->maxLength(120),
-
-                    Forms\Components\Select::make('tipo_cuenta')
-                        ->label('Tipo de cuenta')
-                        ->options([
-                            'Ahorros' => 'Ahorros',
-                            'Corriente' => 'Corriente',
-                        ]),
-
-                    Forms\Components\TextInput::make('numero_cuenta')
-                        ->label('Número de cuenta')
-                        ->maxLength(50),
-
-                    Forms\Components\Toggle::make('cuenta_actualizada')
-                        ->label('Cuenta actualizada')
-                        ->live()
-                        ->visible(fn ($get) => $get('tipo_postulacion') === 'renovacion'),
-                ])
-                ->columns(2),
-
-            Forms\Components\Section::make('Información adicional')
-                ->schema([
-                    Forms\Components\Textarea::make('como_encontro')
-                        ->label(fn ($get) => $get('tipo_postulacion') === 'renovacion'
-                            ? 'Recomendación para la fundación o sugerencia'
-                            : '¿Cómo encontró la Fundación?'
-                        )
-                        ->rows(4)
-                        ->maxLength(2000),
+                        ->columns(1),
                 ]),
 
-            Forms\Components\Section::make('Gestión interna')
+            Forms\Components\Tabs\Tab::make('Postulante')
+                ->icon('heroicon-o-identification')
                 ->schema([
-                    Forms\Components\Select::make('estado')
-                    ->label('Estado')
-                    ->options([
-                        'Postulado' => 'Postulado',
-                        'En estudio' => 'En estudio',
-                        'Pendiente aprobación gerencia' => 'Pendiente aprobación gerencia',
-                        'Aprobado' => 'Aprobado',
-                        'Rechazado' => 'Rechazado',
-                        'Cancelado' => 'Cancelado',
-                    ])
-                    ->required()
-                    ->default('Postulado')
-                    ->disabled(fn ($record) => $record && in_array($record->estado, ['Aprobado', 'Rechazado', 'Cancelado'], true)),
-                 
-                    Forms\Components\Textarea::make('perfil_descriptivo')
-                        ->label('Perfil descriptivo')
-                        ->rows(4)
-                        ->maxLength(5000)
-                        ->disabled(fn () => ! (auth()->user()?->hasAnyRole(['admin', 'admin_panel', 'coordinacion', 'coordinador']) ?? false)),
+                    Forms\Components\Section::make('Datos del Postulante')
+                        ->description('Información principal del estudiante que solicita la beca.')
+                        ->schema([
+                            Forms\Components\Select::make('tipo_postulacion')
+                                ->label('Tipo de postulación')
+                                ->options([
+                                    'primer_semestre' => 'Ingreso a primer semestre (primera vez)',
+                                    'otro_semestre' => 'Ingreso a otro semestre (primera vez)',
+                                    'renovacion' => 'Renovación (ya becado)',
+                                    'becado_actual' => 'Becado actual',
+                                ])
+                                ->required()
+                                ->live(),
 
-                    Forms\Components\Textarea::make('entrevista_observaciones')
-                        ->label('Observaciones de entrevista')
-                        ->rows(5)
-                        ->maxLength(10000)
-                        ->columnSpanFull()
-                        ->disabled(fn () => ! (auth()->user()?->hasAnyRole(['admin', 'coordinacion', 'coordinador']) ?? false)),
+                            Forms\Components\TextInput::make('estudiante_nombre')
+                                ->label('Nombre completo')
+                                ->required()
+                                ->maxLength(255),
 
-                    Forms\Components\Checkbox::make('entrevista_recomendado')
-                        ->label('Recomendado para revisión prioritaria de gerencia')
-                        ->helperText('Marque esta opción si la solicitud debe ser revisada con prioridad por gerencia.')
-                        ->disabled(fn () => ! (auth()->user()?->hasAnyRole(['admin', 'coordinacion', 'coordinador']) ?? false)),
+                            Forms\Components\TextInput::make('estudiante_email')
+                                ->label('Correo electrónico')
+                                ->required()
+                                ->email()
+                            
+                                ->maxLength(255),
+
+                            Forms\Components\DatePicker::make('fecha_nacimiento')
+                                ->label('Fecha de nacimiento'),
+
+                            Forms\Components\Select::make('tipo_documento')
+                                ->label('Tipo de documento')
+                                ->options([
+                                    'CC' => 'Cédula de ciudadanía',
+                                    'TI' => 'Tarjeta de identidad',
+                                    'CE' => 'Cédula de extranjería',
+                                    'PAS' => 'Pasaporte',
+                                    'RC' => 'Registro civil',
+                                ])
+                                ->required()
+                                ->searchable(),
+
+                            Forms\Components\TextInput::make('documento_identidad')
+                                ->label('Número de documento')
+                                ->required()
+                                ->maxLength(50),
+
+                            Forms\Components\TextInput::make('clave_usuario')
+                                ->label('Clave de acceso del postulante')
+                                ->password()
+                                ->revealable()
+                                ->required(fn (string $operation): bool => $operation === 'create')
+                                ->dehydrated(false)
+                                ->visible(fn () => auth()->user()?->hasRole('admin') ?? false),
+
+                            Forms\Components\TextInput::make('telefono_celular')
+                                ->label('Teléfono celular')
+                                ->maxLength(30),
+
+                            Forms\Components\TextInput::make('telefono_fijo')
+                                ->label('Teléfono fijo')
+                                ->maxLength(30),
+
+                            Forms\Components\TextInput::make('direccion')
+                                ->label('Dirección')
+                                ->maxLength(120),
+
+                            Forms\Components\TextInput::make('barrio')
+                                ->label('Barrio')
+                                ->maxLength(80),
+
+                            Forms\Components\Select::make('genero')
+                                ->label('Género')
+                                ->options([
+                                    'F' => 'F',
+                                    'M' => 'M',
+                                    'Otro' => 'Otro',
+                                    'Prefiero no decir' => 'Prefiero no decir',
+                                ]),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make('Acudiente')
+                        ->description('Datos del acudiente o persona de contacto del solicitante.')
+                        ->schema([
+                            Forms\Components\TextInput::make('nombre_acudiente')
+                                ->label('Nombre acudiente')
+                                ->maxLength(120),
+
+                            Forms\Components\TextInput::make('telefono_acudiente')
+                                ->label('Teléfono acudiente')
+                                ->maxLength(30),
+                        ])
+                        ->columns(2),
+
+                    Forms\Components\Section::make('Información adicional')
+                        ->description('Información complementaria de la postulación.')
+                        ->schema([
+                            Forms\Components\Textarea::make('como_encontro')
+                                ->label(fn ($get) => $get('tipo_postulacion') === 'renovacion'
+                                    ? 'Recomendación para la fundación o sugerencia'
+                                    : '¿Cómo encontró la Fundación?'
+                                )
+                                ->rows(4)
+                                ->maxLength(2000),
+                        ]),
+                ]),
+
+            Forms\Components\Tabs\Tab::make('Académico')
+    ->icon('heroicon-o-academic-cap')
+    ->schema([
+
+        Forms\Components\Section::make('Historial académico por semestre')
+            ->description('Seleccione los semestres cursados por el becado y registre el promedio acumulado correspondiente a cada uno.')
+            ->schema([
+                Forms\Components\Repeater::make('semestres_promedios')
+                    ->label('Semestres y promedios acumulados')
+                    ->schema([
+                        Forms\Components\Select::make('semestre')
+                            ->label('Semestre')
+                            ->options([
+                                1 => 'Semestre 1',
+                                2 => 'Semestre 2',
+                                3 => 'Semestre 3',
+                                4 => 'Semestre 4',
+                                5 => 'Semestre 5',
+                                6 => 'Semestre 6',
+                                7 => 'Semestre 7',
+                                8 => 'Semestre 8',
+                                9 => 'Semestre 9',
+                                10 => 'Semestre 10',
+                                11 => 'Semestre 11',
+                                12 => 'Semestre 12',
+                                13 => 'Semestre 13',
+                            ])
+                             ->placeholder('Seleccione el semestre')
+                            ->required()
+                            ->distinct()
+                            ->disableOptionsWhenSelectedInSiblingRepeaterItems()
+                            ->placeholder('Seleccione el semestre')
+                            ->native(),
+
+                        Forms\Components\TextInput::make('promedio_acumulado')
+                            ->label('Promedio acumulado')
+                            ->numeric()
+                            ->minValue(0)
+                            ->maxValue(5)
+                            ->step('0.01')
+                            ->required()
+                            ->placeholder('Ej: 4.5'),
                     ])
-                    ->columns(1),
+                    ->columns(2)
+                    ->defaultItems(1)
+                    ->addActionLabel('Agregar semestre')
+                    ->reorderable(false)
+                    ->collapsible()
+                    ->itemLabel(fn (array $state): ?string => isset($state['semestre'])
+                        ? 'Semestre ' . $state['semestre']
+                        : 'Nuevo semestre'
+                    )
+                    ->columnSpanFull(),
+            ])
+            ->columns(1)
+            ->visible(fn ($get) =>
+                (auth()->user()?->hasAnyRole(['admin', 'gerencia']) ?? false)
+                && in_array($get('tipo_postulacion'), ['renovacion', 'becado_actual'], true)
+            ),
+
+        Forms\Components\Section::make('Puntajes')
+            ->description('Registre los puntajes y promedios académicos requeridos.')
+            ->schema([
+                Forms\Components\TextInput::make('puntaje_saber')
+                    ->label('Puntaje Saber 11')
+                    ->numeric()
+                    ->required(),
+
+                Forms\Components\TextInput::make('promedio_universitario')
+                    ->label('Promedio acumulado')
+                    ->numeric()
+                    ->step(0.1)
+                    ->required(),
+            ])
+            ->columns(2),
+
+        Forms\Components\Section::make('Estudios')
+            ->description('Información de universidad, carrera y semestre según el tipo de postulación.')
+            ->schema([
+                Forms\Components\TextInput::make('universidad_aplica')
+                    ->label('Universidad a la que aplica')
+                    ->maxLength(160)
+                    ->visible(fn ($get) => $get('tipo_postulacion') === 'primer_semestre'),
+
+                Forms\Components\TextInput::make('carrera_aplica')
+                    ->label('Carrera a la que aplica')
+                    ->maxLength(160)
+                    ->visible(fn ($get) => $get('tipo_postulacion') === 'primer_semestre'),
+
+                Forms\Components\TextInput::make('universidad_actual')
+                    ->label('Universidad actual')
+                    ->maxLength(160)
+                    ->visible(fn ($get) => in_array($get('tipo_postulacion'), ['otro_semestre', 'renovacion', 'becado_actual'], true)),
+
+                Forms\Components\TextInput::make('carrera_actual')
+                    ->label('Carrera actual')
+                    ->maxLength(160)
+                    ->visible(fn ($get) => in_array($get('tipo_postulacion'), ['otro_semestre', 'renovacion', 'becado_actual'], true)),
+
+                Forms\Components\TextInput::make('semestre_en_curso')
+                    ->label('Semestre en curso')
+                    ->numeric()
+                    ->minValue(1)
+                    ->maxValue(13)
+                    ->visible(fn ($get) => in_array($get('tipo_postulacion'), ['otro_semestre', 'renovacion', 'becado_actual'], true)),
+            ])
+            ->columns(2),
+    ]),
+
+            Forms\Components\Tabs\Tab::make('Bancario')
+                ->icon('heroicon-o-banknotes')
+                ->schema([
+                    Forms\Components\Section::make('Datos bancarios')
+                        ->description('Información de cuenta bancaria para pagos o desembolsos.')
+                        ->schema([
+                            Forms\Components\Select::make('banco')
+    ->label('Banco')
+    ->options(BankOptions::options())
+    ->searchable()
+    ->preload()
+    ->native(false)
+    ->placeholder('Seleccione el banco')
+    ->required()
+    ->helperText('Seleccione la entidad bancaria o billetera digital registrada por el becario.'),
+
+                            Forms\Components\TextInput::make('titular_cuenta')
+                                ->label('Titular de la cuenta')
+                                ->maxLength(120),
+
+                            Forms\Components\Select::make('tipo_cuenta')
+                                ->label('Tipo de cuenta')
+                                ->options([
+                                    'Ahorros' => 'Ahorros',
+                                    'Corriente' => 'Corriente',
+                                ]),
+
+                            Forms\Components\TextInput::make('numero_cuenta')
+                                ->label('Número de cuenta')
+                                ->maxLength(50),
+
+                            Forms\Components\Toggle::make('cuenta_actualizada')
+                                ->label('Cuenta actualizada')
+                                ->live()
+                                ->visible(fn ($get) => $get('tipo_postulacion') === 'renovacion'),
+                        ])
+                        ->columns(2),
+                ]),
+
+            Forms\Components\Tabs\Tab::make('Gestión interna')
+                ->icon('heroicon-o-clipboard-document-check')
+                ->schema([
+                    Forms\Components\Section::make('Gestión interna')
+                        ->description('Campos administrativos para seguimiento, entrevista y decisión del proceso.')
+                        ->schema([
+                            Forms\Components\Select::make('estado')
+                                ->label('Estado')
+                                ->options([
+                                    'Postulado' => 'Postulado',
+                                    'En estudio' => 'En estudio',
+                                    'Pendiente aprobación gerencia' => 'Pendiente aprobación gerencia',
+                                    'Aprobado' => 'Aprobado',
+                                    'Rechazado' => 'Rechazado',
+                                    'Cancelado' => 'Cancelado',
+                                ])
+                                ->required()
+                                ->default('Postulado')
+                                ->disabled(fn ($record) => $record && in_array($record->estado, ['Aprobado', 'Rechazado', 'Cancelado'], true)),
+
+                            Forms\Components\Textarea::make('perfil_descriptivo')
+                                ->label('Perfil descriptivo')
+                                ->rows(4)
+                                ->maxLength(5000)
+                                ->disabled(fn () => ! (auth()->user()?->hasRole('admin') ?? false)),
+
+                            Forms\Components\Textarea::make('entrevista_observaciones')
+                                ->label('Observaciones de entrevista')
+                                ->rows(5)
+                                ->maxLength(10000)
+                                ->columnSpanFull()
+                                ->disabled(fn () => ! (auth()->user()?->hasRole('admin') ?? false)),
+
+                            Forms\Components\Checkbox::make('entrevista_recomendado')
+                                ->label('Recomendado para revisión prioritaria de gerencia')
+                                ->helperText('Marque esta opción si la solicitud debe ser revisada con prioridad por gerencia.')
+                                ->disabled(fn () => ! (auth()->user()?->hasRole('admin') ?? false)),
+                        ])
+                        ->columns(1),
 
                     Forms\Components\Section::make('Observaciones de gerencia')
+                        ->description('Nota registrada por gerencia. Este campo es solo de consulta en el formulario.')
                         ->schema([
                             Forms\Components\Textarea::make('gerencia_observaciones')
                                 ->label('Nota de gerencia')
@@ -346,61 +437,101 @@ public static function canDelete($record): bool
                         ])
                         ->visible(fn ($record) => filled($record?->gerencia_observaciones))
                         ->columns(1),
+                ]),
 
+            Forms\Components\Tabs\Tab::make('Documentos')
+    ->icon('heroicon-o-folder-open')
+    ->schema([
+        Forms\Components\Section::make('Documentos')
+            ->description('Adjunte, revise o reemplace los documentos requeridos según el tipo de postulación.')
+            ->schema([
+                Forms\Components\FileUpload::make('anexo_foto_documento')
+                    ->label('Foto tipo documento')
+                    ->disk('public')
+                    ->directory('postulaciones/anexos')
+                    ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
+                    ->image()          
+                    ->imagePreviewHeight('130')
+                    ->previewable()
+                    ->deletable()
+                    ->preserveFilenames()
+                    ->panelLayout('compact')
+                    ->helperText('JPG o PNG. Puede eliminar y cargar nuevamente.')
+                    ->extraAttributes([
+                
+                    ])
+                    ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
 
-            Forms\Components\Section::make('Documentos')
-                ->schema([
-                    Forms\Components\FileUpload::make('anexo_foto_documento')
-                        ->label('Foto tipo documento')
-                        ->disk('public')
-                        ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/jpg'])
-                        ->imageEditor()
-                        ->directory('postulaciones/anexos')
-                        ->preserveFilenames()
-                        ->openable()
-                        ->downloadable(false)
-                        ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
+                Forms\Components\FileUpload::make('anexo_doc_identidad')
+                    ->label('Documento de identidad')
+                    ->disk('public')
+                    ->directory('postulaciones/anexos')
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                    ->previewable()                                
+                    ->deletable()
+                    ->preserveFilenames()
+                    ->panelLayout('compact')
+                    ->helperText('PDF, JPG o PNG. Puede eliminar y cargar nuevamente.')
+                    ->extraAttributes([
+              
+                    ])
+                    ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
 
-                    Forms\Components\FileUpload::make('anexo_doc_identidad')
-                        ->label('Documento de identidad')
-                        ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
-                        ->directory('postulaciones/anexos')
-                        ->preserveFilenames()
-                        ->openable()
-                        ->downloadable(false)
-                        ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
+                Forms\Components\FileUpload::make('anexo_certificado_bancario')
+                    ->label('Certificado bancario')
+                    ->disk('public')
+                    ->directory('postulaciones/anexos')
+                    ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
+                    ->previewable()
+                    ->deletable()
+                    ->preserveFilenames()
+                    ->panelLayout('compact')
+                    ->helperText('Adjunte el certificado bancario actualizado.')
+                    ->extraAttributes([
+                     
+                    ])
+                    ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion' || $get('cuenta_actualizada')),
 
-                    Forms\Components\FileUpload::make('anexo_certificado_bancario')
-                        ->label('Certificado bancario')
-                        ->acceptedFileTypes(['application/pdf', 'image/jpeg', 'image/png'])
-                        ->directory('postulaciones/anexos')
-                        ->preserveFilenames()
-                        ->openable()
-                        ->downloadable(false)
-                        ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion' || $get('cuenta_actualizada')),
+                Forms\Components\FileUpload::make('pdf_notas')
+                    ->label('PDF Notas')
+                    ->disk('public')
+                    ->directory('postulaciones/notas')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->previewable()
+                    ->deletable()
+                    ->preserveFilenames()
+                    ->panelLayout('compact')
+                    ->helperText('Cargue el certificado o reporte de notas en PDF.')
+                    ->extraAttributes([
+                 
+                    ])
+                    ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
 
-                    Forms\Components\FileUpload::make('pdf_notas')
-                        ->label('PDF Notas')
-                        ->acceptedFileTypes(['application/pdf'])
-                        ->directory('postulaciones/notas')
-                        ->preserveFilenames()
-                        ->openable()
-                        ->downloadable(false)
-                        ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
-
-                    Forms\Components\FileUpload::make('pdf_matricula')
-                        ->label('PDF Matrícula')
-                        ->acceptedFileTypes(['application/pdf'])
-                        ->directory('postulaciones/matricula')
-                        ->preserveFilenames()
-                        ->openable()
-                        ->downloadable(false)
-                        ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
-
-                ])
-                ->columns(2),
-        ]);
-    }
+                Forms\Components\FileUpload::make('pdf_matricula')
+                    ->label('PDF Matrícula')
+                    ->disk('public')
+                    ->directory('postulaciones/matricula')
+                    ->acceptedFileTypes(['application/pdf'])
+                    ->previewable()
+                    ->deletable()
+                    ->preserveFilenames()
+                    ->panelLayout('compact')
+                    ->helperText('Cargue el soporte de matrícula en PDF.')
+                    ->extraAttributes([
+                  
+                    ])
+                    ->visible(fn ($get) => $get('tipo_postulacion') !== 'renovacion'),
+            ])
+            ->columns(2)
+            ->extraAttributes([
+                'class' => 'fp-documents-section',
+            ]),
+                ]),
+        ])
+        ->persistTabInQueryString()
+        ->columnSpanFull(),
+    ]);
+}
 
     public static function infolist(Infolist $infolist): Infolist
     {

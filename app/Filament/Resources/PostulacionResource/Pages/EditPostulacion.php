@@ -19,11 +19,34 @@ class EditPostulacion extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        if (($data['estado'] ?? null) !== ($this->record->estado ?? null)) {
-            $data['estado_actualizado_por'] = auth()->id();
-            $data['estado_actualizado_en'] = now();
-        }
+        $data['semestres_promedios'] = $this->normalizarSemestresPromedios(
+            $data['semestres_promedios'] ?? null
+        );
+
+        unset($data['clave_usuario']);
 
         return $data;
+    }
+
+    private function normalizarSemestresPromedios($semestres): ?array
+    {
+        if (! is_array($semestres)) {
+            return null;
+        }
+
+        $items = collect($semestres)
+            ->filter(fn ($item) =>
+                ! empty($item['semestre']) &&
+                isset($item['promedio_acumulado']) &&
+                $item['promedio_acumulado'] !== ''
+            )
+            ->map(fn ($item) => [
+                'semestre' => (int) $item['semestre'],
+                'promedio_acumulado' => (float) $item['promedio_acumulado'],
+            ])
+            ->values()
+            ->toArray();
+
+        return count($items) > 0 ? $items : null;
     }
 }

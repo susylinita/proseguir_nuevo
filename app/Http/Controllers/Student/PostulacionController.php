@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Postulacion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use App\Support\BankOptions;
+use Illuminate\Validation\Rule;
 
 class PostulacionController extends Controller
 {
@@ -53,7 +55,7 @@ if ($user->becas_bloqueado) {
         'como_encontro' => ['nullable', 'string', 'max:2000'],
 
         // Bancarios (se vuelven obligatorios o no, según el tipo)
-        'banco' => ['nullable', 'string', 'max:80'],
+        'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
         'titular_cuenta' => ['nullable', 'string', 'max:120'],
         'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente'],
         'numero_cuenta' => ['nullable', 'string', 'max:50'],
@@ -84,7 +86,7 @@ if ($user->becas_bloqueado) {
             'anexo_certificado_bancario' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png', 'max:5120'],
 
             // Bancarios requeridos en primera vez
-            'banco' => ['required', 'string', 'max:80'],
+            'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
             'titular_cuenta' => ['required', 'string', 'max:120'],
             'tipo_cuenta' => ['required', 'in:Ahorros,Corriente'],
             'numero_cuenta' => ['required', 'string', 'max:50'],
@@ -101,7 +103,7 @@ if ($user->becas_bloqueado) {
             'anexo_certificado_bancario' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,image/jpeg,image/png'],
 
             // Bancarios requeridos en primera vez
-            'banco' => ['required', 'string', 'max:80'],
+            'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
             'titular_cuenta' => ['required', 'string', 'max:120'],
             'tipo_cuenta' => ['required', 'in:Ahorros,Corriente'],
             'numero_cuenta' => ['required', 'string', 'max:50'],
@@ -246,7 +248,7 @@ if ($user->becas_bloqueado) {
         'como_encontro' => ['nullable', 'string', 'max:2000'],
 
         // banco (siempre opcional; en renovación solo se usa si cuenta_actualizada)
-        'banco' => ['nullable', 'string', 'max:80'],
+        'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
         'titular_cuenta' => ['nullable', 'string', 'max:120'],
         'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente'],
         'numero_cuenta' => ['nullable', 'string', 'max:50'],

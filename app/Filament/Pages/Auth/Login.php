@@ -7,6 +7,7 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class Login extends BaseLogin
 {
+    protected static string $view = 'filament.pages.auth.login';
     /**
      * Título de la página
      */

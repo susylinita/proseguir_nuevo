@@ -30,6 +30,7 @@ class Postulacion extends Model
         'universidad_actual',
         'carrera_actual',
         'semestre_en_curso',
+        'semestres_promedios',
         'universidad_aplica',
         'carrera_aplica',
 
@@ -76,6 +77,7 @@ class Postulacion extends Model
     'entrevista_recomendado' => 'boolean',
     'entrevista_registrada_en' => 'datetime',
     'gerencia_observaciones_en' => 'datetime',
+    'semestres_promedios' => 'array',
     ];
 
     public function user()

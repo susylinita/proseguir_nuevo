@@ -2,15 +2,15 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Pages\Auth\Login;
+use App\Filament\Pages\Dashboard;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
-use Filament\Pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -26,42 +26,55 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+
+            // Layout general
             ->maxContentWidth('full')
             ->sidebarCollapsibleOnDesktop(false)
             ->sidebarFullyCollapsibleOnDesktop(false)
+            ->globalSearch(false)
 
-            // ✅ Login nativo de Filament (estable)
-            ->login(\App\Filament\Pages\Auth\Login::class)
+            // Login personalizado
+            ->login(Login::class)
 
-            // ✅ Branding
+            // Branding
             ->brandName('Fundación Proseguir')
             ->brandLogo(asset('brand/logo.png'))
             ->brandLogoHeight('2.25rem')
 
-            // ✅ Colores alineados al portal premium
+            // Colores institucionales
             ->colors([
                 'primary' => Color::Blue,
                 'success' => Color::Emerald,
-                'gray'    => Color::Slate,
-                'danger'  => Color::Rose,
+                'gray' => Color::Slate,
+                'danger' => Color::Rose,
                 'warning' => Color::Amber,
-                'info'    => Color::Sky,
+                'info' => Color::Sky,
             ])
 
-            // ✅ Theme SOLO para Filament (no toca el portal)
+            // Tema admin
             ->viteTheme('resources/css/filament/admin/theme.css')
 
-            // ✅ Descubre recursos/páginas/widgets
-            ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
-            ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
+            // Recursos, páginas y widgets
+            ->discoverResources(
+                in: app_path('Filament/Resources'),
+                for: 'App\\Filament\\Resources'
+            )
+            ->discoverPages(
+                in: app_path('Filament/Pages'),
+                for: 'App\\Filament\\Pages'
+            )
             ->pages([
-                \App\Filament\Pages\Dashboard::class,
+                Dashboard::class,
             ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->discoverWidgets(
+                in: app_path('Filament/Widgets'),
+                for: 'App\\Filament\\Widgets'
+            )
             ->widgets([
+                //
             ])
 
-            // ✅ Middleware Filament
+            // Middleware Filament
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,

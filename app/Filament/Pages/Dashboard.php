@@ -2,18 +2,38 @@
 
 namespace App\Filament\Pages;
 
+use App\Filament\Widgets\AdminHeroWidget;
+use App\Filament\Widgets\DashboardIndicadoresWidget;
+use App\Filament\Widgets\PostulacionesPendientesTable;
 use Filament\Pages\Dashboard as BaseDashboard;
 
 class Dashboard extends BaseDashboard
 {
+    protected static ?string $navigationLabel = 'Escritorio';
+
+    protected static ?string $navigationIcon = 'heroicon-o-home';
+
+    protected static ?int $navigationSort = 1;
+
+
+    public function getTitle(): string
+    {
+        return '';
+    }
+
+    public function getHeading(): string
+    {
+        return '';
+    }
+
     public function getHeaderWidgets(): array
     {
         return [
-            \App\Filament\Widgets\AdminHero::class,
+            AdminHeroWidget::class,
         ];
     }
 
-    public function getHeaderWidgetsColumns(): int|array
+    public function getHeaderWidgetsColumns(): int | array
     {
         return 1;
     }
@@ -21,19 +41,13 @@ class Dashboard extends BaseDashboard
     public function getWidgets(): array
     {
         return [
-            \App\Filament\Widgets\KpisOverview::class,
-            \App\Filament\Widgets\PostulacionesPendientesTable::class,
+            DashboardIndicadoresWidget::class,
+            PostulacionesPendientesTable::class,
         ];
     }
 
-    // 👇 ESTE es el método correcto (no getColumns)
-    public function getWidgetsColumns(): int|array
+    public function getColumns(): int | array
     {
         return 12;
-    }
-
-    public function getColumns(): int | string |array
-    {
-        return 1;
     }
 }

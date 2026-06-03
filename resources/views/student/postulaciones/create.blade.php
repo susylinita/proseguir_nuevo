@@ -321,12 +321,25 @@
 
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4"
                                  :class="(tipo === 'renovacion' && !cuentaActualizada) ? 'opacity-50 pointer-events-none' : ''">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-700">Banco</label>
-                                    <input name="banco" type="text"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                           value="{{ old('banco') }}">
-                                </div>
+                                @php
+    $bancos = \App\Support\BankOptions::options();
+@endphp
+
+<div>
+    <label class="block text-sm font-medium text-gray-700">Banco</label>
+
+    <select name="banco"
+            id="banco"
+            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+        <option value="">Seleccione el banco</option>
+
+        @foreach ($bancos as $value => $label)
+            <option value="{{ $value }}" @selected(old('banco', $postulacion->banco ?? '') === $value)>
+                {{ $label }}
+            </option>
+        @endforeach
+    </select>
+</div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Titular de la cuenta</label>

@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Builder;
 class PostulacionesPendientesTable extends BaseWidget
 {
     protected static ?string $heading = 'Postulaciones recientes (Postulado / En estudio)';
-    protected static ?int $sort = 2;
+    protected static ?int $sort = 3;
+    protected int|string|array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {

@@ -121,6 +121,7 @@ public static function canDelete($record): bool
                                     $set('estudiante_email', $user->email);
                                     $set('documento_identidad', $user->cedula);
                                     $set('tipo_documento', $user->tipo_documento);
+                                    $set('titular_cuenta', $user->name);
                                 }),
                         ])
                         ->columns(1),
@@ -301,8 +302,7 @@ public static function canDelete($record): bool
             ->schema([
                 Forms\Components\TextInput::make('puntaje_saber')
                     ->label('Puntaje Saber 11')
-                    ->numeric()
-                    ->required(),
+                    ->numeric(),
 
                 Forms\Components\TextInput::make('promedio_universitario')
                     ->label('Promedio acumulado')
@@ -361,9 +361,17 @@ public static function canDelete($record): bool
     ->required()
     ->helperText('Seleccione la entidad bancaria o billetera digital registrada por el becario.'),
 
-                            Forms\Components\TextInput::make('titular_cuenta')
-                                ->label('Titular de la cuenta')
-                                ->maxLength(120),
+                                Forms\Components\TextInput::make('titular_cuenta')
+                            ->label('Titular de la cuenta')
+                            ->maxLength(120)
+                            ->disabled()
+                            ->dehydrated()
+                            ->afterStateHydrated(function ($state, callable $set, callable $get) {
+                                if (blank($state) && filled($get('estudiante_nombre'))) {
+                                    $set('titular_cuenta', $get('estudiante_nombre'));
+                                }
+                            })
+                            ->helperText('Este campo se toma automáticamente del nombre del postulante.'),
 
                             Forms\Components\Select::make('tipo_cuenta')
                                 ->label('Tipo de cuenta')
@@ -1034,8 +1042,7 @@ public static function canDelete($record): bool
     ->searchable()
     ->sortable()
     ->limit(45)
-    ->tooltip(fn ($record) => $record->estudiante_nombre)
-    ->wrap(false),
+    ->tooltip(fn ($record) => $record->estudiante_nombre),
 
     Tables\Columns\TextColumn::make('estudiante_email')
         ->label('Email')

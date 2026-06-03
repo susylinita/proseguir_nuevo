@@ -3,12 +3,43 @@
 namespace App\Filament\Resources\PostulacionResource\Pages;
 
 use App\Filament\Resources\PostulacionResource;
+use Filament\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Support\Facades\Hash;
 
 class CreatePostulacion extends CreateRecord
 {
     protected static string $resource = PostulacionResource::class;
+
+    /**
+     * Botón superior para volver al listado de postulaciones.
+     */
+    protected function getHeaderActions(): array
+    {
+        return [
+            Actions\Action::make('volver_postulaciones')
+                ->label('Volver a postulaciones')
+                ->icon('heroicon-o-arrow-left')
+                ->color('gray')
+                ->url(PostulacionResource::getUrl('index')),
+        ];
+    }
+
+    /**
+     * Después de crear la postulación, vuelve al listado.
+     */
+    protected function getRedirectUrl(): string
+    {
+        return PostulacionResource::getUrl('index');
+    }
+
+    /**
+     * Mensaje de confirmación al crear.
+     */
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Postulación creada correctamente';
+    }
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
@@ -18,6 +49,8 @@ class CreatePostulacion extends CreateRecord
 
         if (! empty($data['user_id'])) {
             unset($data['clave_usuario']);
+
+            $data['titular_cuenta'] = $data['estudiante_nombre'] ?? null;
 
             return $data;
         }
@@ -45,6 +78,8 @@ class CreatePostulacion extends CreateRecord
         }
 
         unset($data['clave_usuario']);
+
+        $data['titular_cuenta'] = $data['estudiante_nombre'] ?? null;
 
         return $data;
     }

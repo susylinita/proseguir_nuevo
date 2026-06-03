@@ -24,6 +24,7 @@ class EditPostulacion extends EditRecord
         );
 
         unset($data['clave_usuario']);
+        $data['titular_cuenta'] = $data['estudiante_nombre'] ?? null;
 
         return $data;
     }

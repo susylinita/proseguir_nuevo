@@ -64,6 +64,60 @@
         </div>
     @endif
 
+    {{-- FOTO SUPERIOR DEL POSTULADO / BECADO --}}
+<div class="mb-6 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <div class="flex flex-col items-center gap-4 sm:flex-row sm:items-center">
+        <div class="flex h-32 w-32 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 shadow-sm">
+            @if (!empty($postulacion->anexo_foto_documento))
+                <img
+                    src="{{ Storage::disk('public')->url($postulacion->anexo_foto_documento) }}"
+                    alt="Foto del postulado"
+                    class="h-full w-full object-cover"
+                >
+            @else
+                <div class="flex h-full w-full items-center justify-center text-center text-sm font-semibold text-slate-400">
+                    Sin foto
+                </div>
+            @endif
+        </div>
+
+        <div class="text-center sm:text-left">
+            <div class="text-sm font-semibold uppercase tracking-wide text-slate-500">
+                Postulado / Becado
+            </div>
+
+            <div class="mt-1 text-2xl font-black text-slate-900">
+                {{ $postulacion->estudiante_nombre ?? 'Nombre no registrado' }}
+            </div>
+
+            <div class="mt-1 text-sm text-slate-500">
+                Documento:
+                <span class="font-semibold text-slate-700">
+                    {{ $postulacion->tipo_documento ?? 'N/D' }}
+                    {{ $postulacion->documento_identidad ?? '' }}
+                </span>
+            </div>
+
+            <div class="mt-3 inline-flex rounded-full border px-3 py-1 text-sm font-bold
+                @if (($postulacion->estado ?? '') === 'Aprobado')
+                    border-green-200 bg-green-50 text-green-700
+                @elseif (($postulacion->estado ?? '') === 'Rechazado')
+                    border-red-200 bg-red-50 text-red-700
+                @elseif (($postulacion->estado ?? '') === 'En estudio')
+                    border-blue-200 bg-blue-50 text-blue-700
+                @elseif (($postulacion->estado ?? '') === 'Pendiente aprobación gerencia')
+                    border-indigo-200 bg-indigo-50 text-indigo-700
+                @else
+                    border-slate-200 bg-slate-50 text-slate-700
+                @endif
+            ">
+                {{ $postulacion->estado ?? 'Sin estado' }}
+            </div>
+        </div>
+    </div>
+</div>
+
+
     {{-- Resumen principal --}}
     <div class="rounded-xl border border-slate-200 bg-white p-4">
         <h3 class="text-base font-semibold text-slate-900">

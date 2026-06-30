@@ -1,5 +1,147 @@
 <x-app-layout>
     <x-slot name="header">
+        <style>
+    .student-postulation-page {
+        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #0f172a;
+    }
+
+    .student-postulation-card {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 24px;
+        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+        overflow: hidden;
+    }
+
+    .student-postulation-inner {
+        padding: 2rem;
+    }
+
+    .student-section {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 22px;
+        padding: 1.5rem;
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+    }
+
+    .student-section-title {
+        font-size: 1.05rem;
+        font-weight: 800;
+        letter-spacing: .04em;
+        text-transform: uppercase;
+        color: #1e3a8a;
+        margin-bottom: 1rem;
+        padding-bottom: .85rem;
+        border-bottom: 1px solid #e2e8f0;
+    }
+
+    .student-postulation-page label {
+        display: block;
+        margin-bottom: .45rem;
+        font-size: 1rem;
+        font-weight: 700;
+        color: #334155;
+    }
+
+    .student-postulation-page input[type="text"],
+    .student-postulation-page input[type="email"],
+    .student-postulation-page input[type="number"],
+    .student-postulation-page input[type="date"],
+    .student-postulation-page select,
+    .student-postulation-page textarea {
+        width: 100%;
+        border-radius: 14px !important;
+        border: 1px solid #cbd5e1 !important;
+        background-color: #ffffff !important;
+        padding: .85rem 1rem !important;
+        font-size: 1rem !important;
+        line-height: 1.5rem !important;
+        color: #0f172a !important;
+        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+        outline: none !important;
+    }
+
+    .student-postulation-page input:focus,
+    .student-postulation-page select:focus,
+    .student-postulation-page textarea:focus {
+        border-color: #2563eb !important;
+        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13) !important;
+    }
+
+    .student-postulation-page input[type="file"] {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px dashed #cbd5e1;
+        background: #f8fafc;
+        padding: .9rem;
+        font-size: .95rem;
+        color: #334155;
+    }
+
+    .student-postulation-page p,
+    .student-postulation-page .help-text {
+        font-size: .95rem;
+        line-height: 1.55rem;
+        color: #64748b;
+    }
+
+    .student-readonly-box {
+        background: linear-gradient(135deg, #eff6ff, #f8fafc);
+        border: 1px solid #dbeafe;
+        border-radius: 22px;
+        padding: 1.5rem;
+    }
+
+    .student-actions-bar {
+        position: sticky;
+        bottom: 0;
+        z-index: 20;
+        margin-top: 2rem;
+        border: 1px solid #e2e8f0;
+        border-radius: 22px;
+        background: rgba(255, 255, 255, .94);
+        backdrop-filter: blur(10px);
+        padding: 1rem;
+        box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    .student-btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        background: #1d4ed8;
+        padding: .85rem 1.4rem;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #ffffff;
+        transition: all .15s ease;
+    }
+
+    .student-btn-primary:hover {
+        background: #1e40af;
+    }
+
+    .student-btn-secondary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 14px;
+        border: 1px solid #cbd5e1;
+        background: #ffffff;
+        padding: .85rem 1.4rem;
+        font-size: 1rem;
+        font-weight: 800;
+        color: #334155;
+        transition: all .15s ease;
+    }
+
+    .student-btn-secondary:hover {
+        background: #f8fafc;
+    }
+</style>
     <div class="rounded-2xl p-8 
                 bg-gradient-to-r from-slate-100 via-slate-200 to-blue-100 
                 border border-slate-200 shadow-sm">
@@ -53,7 +195,7 @@
 </x-slot>
 
 
-    <div class="max-w-5xl mx-auto py-10 px-6">
+    <div class="student-postulation-page max-w-6xl mx-auto py-10 px-6">
 
             @if ($errors->any())
                 <div class="rounded-md bg-red-50 p-4">
@@ -66,16 +208,16 @@
                 </div>
             @endif
 
-            <div class="bg-white rounded-2xl border border-slate-200 shadow-sm">
-            <div class="p-8 text-slate-900"
+            <div class="student-postulation-card">
+            <div class="student-postulation-inner"
                      x-data="{
                         tipo: '{{ old('tipo_postulacion', 'primer_semestre') }}',
                         cuentaActualizada: {{ old('cuenta_actualizada', 0) ? 'true' : 'false' }}
                      }">
 
                     {{-- Bloque informativo (solo lectura) --}}
-                    <div class="rounded-md border border-gray-200 bg-gray-50 p-4 text-sm">
-                        <div class="text-xs uppercase tracking-wider text-gray-500 mb-2">
+                    <div class="student-readonly-box">
+                        <div class="student-section-title">
                             Datos del postulante
                         </div>
 
@@ -125,8 +267,8 @@
                         </div>
 
                         {{-- Datos personales --}}
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                        <div class="student-section">
+                            <div class="student-section-title">
                                 Datos personales
                             </div>
 
@@ -212,8 +354,8 @@
                         </div>
 
                         {{-- Acudiente --}}
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                        <div class="student-section">
+                            <div class="student-section-title">
                                 Datos del acudiente
                             </div>
 
@@ -235,8 +377,8 @@
                         </div>
 
                         {{-- Estudios (según tipo) --}}
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                        <div class="student-section">
+                            <div class="student-section-title">
                                 Estudios
                             </div>
 
@@ -310,8 +452,8 @@
                         </div>
 
                         {{-- Datos bancarios --}}
-                        <div class="rounded-md border border-gray-200 p-4">
-                            <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+                        <div class="student-section">
+                            <div class="student-section-title">
                                 Datos bancarios
                             </div>
 
@@ -354,6 +496,8 @@
                                         <option value="">Selecciona…</option>
                                         <option value="Ahorros" @selected(old('tipo_cuenta')==='Ahorros')>Ahorros</option>
                                         <option value="Corriente" @selected(old('tipo_cuenta')==='Corriente')>Corriente</option>
+                                        <option value="Nequi" @selected(old('tipo_cuenta')==='Nequi')>Nequi</option>
+                                        <option value="Daviplata" @selected(old('tipo_cuenta')==='Daviplata')>Daviplata</option>
                                     </select>
                                 </div>
 
@@ -372,8 +516,8 @@
                         </div>
 
                                         {{-- Pregunta abierta --}}
-<div class="rounded-md border border-gray-200 p-4">
-    <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+<div class="student-section">
+    <div class="student-section-title">
         <span x-show="tipo == 'renovacion'" x-cloak>
             Recomendación para la fundación o sugerencia
         </span>
@@ -426,8 +570,8 @@
 </div>
                     
                         {{-- Anexos --}}
-<div class="rounded-md border border-gray-200 p-4">
-    <div class="text-xs uppercase tracking-wider text-gray-500 mb-3">
+<div class="student-section">
+    <div class="student-section-title">
         Anexos
     </div>
 
@@ -599,17 +743,19 @@
 
 
                         {{-- BOTONES --}}
-                    <div class="flex justify-end gap-4 pt-4 border-t border-slate-200">
+                    <div class="student-actions-bar">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:justify-end">
                         <a href="{{ route('student.postulaciones.index') }}"
-                           class="px-6 py-2.5 rounded-xl border border-slate-300 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                        class="student-btn-secondary">
                             Cancelar
                         </a>
 
                         <button type="submit"
-                                class="px-6 py-2.5 rounded-xl bg-slate-900 text-white text-sm font-semibold hover:bg-black transition shadow-sm">
+                                class="student-btn-primary">
                             Crear postulación
                         </button>
                     </div>
+                </div>
 
                     </form>
 

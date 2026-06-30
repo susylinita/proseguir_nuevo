@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Storage;
 use Filament\Tables\Enums\ActionsPosition;
 use App\Support\BankOptions;
+use App\Imports\BecadosActualesImport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class PostulacionResource extends Resource
 {
@@ -378,7 +380,11 @@ public static function canDelete($record): bool
                                 ->options([
                                     'Ahorros' => 'Ahorros',
                                     'Corriente' => 'Corriente',
+                                    'Nequi' => 'Nequi',
+                                    'Daviplata' => 'Daviplata',
                                 ]),
+                                
+                                   
 
                             Forms\Components\TextInput::make('numero_cuenta')
                                 ->label('Número de cuenta')
@@ -1023,6 +1029,50 @@ public static function canDelete($record): bool
                             'planilla_contabilidad_aprobados_' . $fecha->format('Ymd_His') . '.pdf'
                         );
                     }),
+                    Action::make('importar_becados_actuales')
+    ->label('Importar becados actuales')
+    ->icon('heroicon-o-arrow-up-tray')
+    ->color('success')
+    ->visible(fn () => auth()->user()?->hasRole('admin') ?? false)
+    ->form([
+        Forms\Components\FileUpload::make('archivo')
+            ->label('Archivo Excel de becados actuales')
+            ->disk('local')
+            ->directory('imports/becados')
+            ->acceptedFileTypes([
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'application/vnd.ms-excel',
+                'text/csv',
+            ])
+            ->required()
+            ->helperText('Cargue el archivo Excel con la base de becados actuales.'),
+    ])
+    ->action(function (array $data) {
+        $import = new BecadosActualesImport();
+
+        Excel::import($import, storage_path('app/' . $data['archivo']));
+
+        $mensaje = "Creados: {$import->creados}. Actualizados: {$import->actualizados}. Omitidos/advertencias: {$import->omitidos}.";
+
+        if (count($import->errores) > 0) {
+            $primerosErrores = collect($import->errores)
+                ->take(10)
+                ->implode("\n");
+
+            $mensaje .= "\n\nErrores encontrados:\n" . $primerosErrores;
+
+            if (count($import->errores) > 10) {
+                $mensaje .= "\n\nHay más errores. Total errores: " . count($import->errores);
+            }
+        }
+
+        Notification::make()
+            ->title('Importación finalizada')
+            ->body($mensaje)
+            ->success()
+            ->persistent()
+            ->send();
+    }),
             ])
             ->columns([
     Tables\Columns\TextColumn::make('documento_identidad')

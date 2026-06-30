@@ -6,6 +6,7 @@
         'primer_semestre' => 'Ingreso a primer semestre',
         'otro_semestre' => 'Ingreso a otro semestre',
         'renovacion' => 'Renovación',
+        'becado_actual' => 'Becado actual',
         default => 'N/D',
     };
 
@@ -236,97 +237,158 @@
         </div>
     </div>
 
-    {{-- Información académica --}}
-    <div class="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 class="text-base font-semibold text-slate-900">
-            Información académica
-        </h3>
+    {{-- INFORMACIÓN ACADÉMICA --}}
+<div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+    <h3 class="mb-4 text-lg font-bold text-slate-900">
+        Información académica
+    </h3>
 
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            @if ($postulacion->tipo_postulacion === 'primer_semestre')
-                <div>
-                    @if (!empty($postulacion->semestres_promedios))
-    <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-        <h3 class="text-lg font-bold text-slate-900">
-            Historial académico por semestre
-        </h3>
+    @php
+        $tipo = $postulacion->tipo_postulacion;
 
-        <p class="mt-1 text-sm text-slate-500">
-            Promedios acumulados registrados para el becario.
-        </p>
+        $tipoTexto = match ($tipo) {
+            'primer_semestre' => 'Ingreso a primer semestre',
+            'otro_semestre' => 'Ingreso a otro semestre',
+            'renovacion' => 'Renovación',
+            'becado_actual' => 'Becado actual',
+            default => 'N/D',
+        };
 
-        <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach ($postulacion->semestres_promedios as $item)
-                @php
-                    $promedio = isset($item['promedio_acumulado'])
-                        ? (float) $item['promedio_acumulado']
-                        : null;
+        $universidad = $tipo === 'primer_semestre'
+            ? $postulacion->universidad_aplica
+            : $postulacion->universidad_actual;
 
-                    $colorClase = $promedio !== null && $promedio <= 3.8
-                        ? 'text-red-700 bg-red-50 border-red-200'
-                        : 'text-green-700 bg-green-50 border-green-200';
-                @endphp
+        $carrera = $tipo === 'primer_semestre'
+            ? $postulacion->carrera_aplica
+            : $postulacion->carrera_actual;
 
-                <div class="rounded-xl border p-4 {{ $colorClase }}">
-                    <div class="text-sm font-semibold">
-                        Semestre {{ $item['semestre'] ?? 'N/D' }}
-                    </div>
+        $promedioGeneral = $postulacion->promedio_universitario
+            ?? $postulacion->promedio_carrera
+            ?? null;
 
-                    <div class="mt-1 text-2xl font-black">
-                        {{ $promedio !== null ? number_format($promedio, 2) : 'N/D' }}
-                    </div>
+        $semestresPromedios = $postulacion->semestres_promedios;
 
-                    <div class="mt-1 text-xs font-medium opacity-80">
-                        Promedio acumulado
-                    </div>
-                </div>
-            @endforeach
+        if (is_string($semestresPromedios)) {
+            $semestresPromedios = json_decode($semestresPromedios, true);
+        }
+
+        if (! is_array($semestresPromedios)) {
+            $semestresPromedios = [];
+        }
+    @endphp
+
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div>
+            <div class="text-sm font-medium text-slate-500">
+                Tipo de postulación
+            </div>
+            <div class="mt-1 font-semibold text-slate-900">
+                {{ $tipoTexto }}
+            </div>
+        </div>
+
+        <div>
+            <div class="text-sm font-medium text-slate-500">
+                Universidad
+            </div>
+            <div class="mt-1 font-semibold text-slate-900">
+                {{ filled($universidad) ? $universidad : 'N/D' }}
+            </div>
+        </div>
+
+        <div>
+            <div class="text-sm font-medium text-slate-500">
+                Carrera
+            </div>
+            <div class="mt-1 font-semibold text-slate-900">
+                {{ filled($carrera) ? $carrera : 'N/D' }}
+            </div>
+        </div>
+
+        <div>
+            <div class="text-sm font-medium text-slate-500">
+                Semestre actual
+            </div>
+            <div class="mt-1 font-semibold text-slate-900">
+                {{ filled($postulacion->semestre_en_curso) ? $postulacion->semestre_en_curso : 'N/D' }}
+            </div>
+        </div>
+
+        <div>
+            <div class="text-sm font-medium text-slate-500">
+                Promedio acumulado
+            </div>
+
+            @php
+                $promedioClase = filled($promedioGeneral) && ((float) $promedioGeneral) >= 3.8
+                    ? 'text-green-700'
+                    : 'text-red-700';
+            @endphp
+
+            <div class="mt-1 font-bold {{ filled($promedioGeneral) ? $promedioClase : 'text-slate-900' }}">
+                {{ filled($promedioGeneral) ? number_format((float) $promedioGeneral, 2) : 'N/D' }}
+            </div>
+        </div>
+
+        <div>
+            <div class="text-sm font-medium text-slate-500">
+                Puntaje Saber 11
+            </div>
+
+            @php
+                $puntaje = $postulacion->puntaje_saber;
+                $puntajeClase = filled($puntaje) && ((float) $puntaje) >= 300
+                    ? 'text-green-700'
+                    : 'text-red-700';
+            @endphp
+
+            <div class="mt-1 font-bold {{ filled($puntaje) ? $puntajeClase : 'text-slate-900' }}">
+                {{ filled($puntaje) ? $puntaje : 'N/D' }}
+            </div>
         </div>
     </div>
-@endif
-                    <div class="text-slate-500">Universidad a la que aplica</div>
-                    <div class="font-medium text-slate-900">
-                        {{ $postulacion->universidad_aplica ?? 'N/D' }}
-                    </div>
-                </div>
 
-                <div>
-                    <div class="text-slate-500">Carrera a la que aplica</div>
-                    <div class="font-medium text-slate-900">
-                        {{ $postulacion->carrera_aplica ?? 'N/D' }}
-                    </div>
-                </div>
-            @elseif ($postulacion->tipo_postulacion === 'otro_semestre')
-                <div>
-                    <div class="text-slate-500">Universidad actual</div>
-                    <div class="font-medium text-slate-900">
-                        {{ $postulacion->universidad_actual ?? 'N/D' }}
-                    </div>
-                </div>
+    {{-- PROMEDIOS POR SEMESTRE --}}
+    @if (count($semestresPromedios) > 0)
+        <div class="mt-6 border-t border-slate-200 pt-5">
+            <h4 class="mb-3 text-base font-bold text-slate-900">
+                Promedios por semestre
+            </h4>
 
-                <div>
-                    <div class="text-slate-500">Carrera actual</div>
-                    <div class="font-medium text-slate-900">
-                        {{ $postulacion->carrera_actual ?? 'N/D' }}
-                    </div>
-                </div>
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                @foreach ($semestresPromedios as $item)
+                    @php
+                        $promedioSemestre = isset($item['promedio_acumulado'])
+                            ? (float) $item['promedio_acumulado']
+                            : null;
 
-                <div>
-                    <div class="text-slate-500">Semestre en curso</div>
-                    <div class="font-medium text-slate-900">
-                        {{ $postulacion->semestre_en_curso ?? 'N/D' }}
+                        $clasePromedio = $promedioSemestre !== null && $promedioSemestre >= 3.8
+                            ? 'border-green-200 bg-green-50 text-green-700'
+                            : 'border-red-200 bg-red-50 text-red-700';
+                    @endphp
+
+                    <div class="rounded-xl border p-4 {{ $clasePromedio }}">
+                        <div class="text-sm font-semibold">
+                            Semestre {{ $item['semestre'] ?? 'N/D' }}
+                        </div>
+
+                        <div class="mt-1 text-2xl font-black">
+                            {{ $promedioSemestre !== null ? number_format($promedioSemestre, 2) : 'N/D' }}
+                        </div>
+
+                        <div class="mt-1 text-xs font-medium opacity-80">
+                            Promedio acumulado
+                        </div>
                     </div>
-                </div>
-            @elseif ($postulacion->tipo_postulacion === 'renovacion')
-                <div class="md:col-span-2">
-                    <div class="text-slate-500">Renovación</div>
-                    <div class="font-medium text-slate-900">
-                        La solicitud corresponde a una renovación de beca.
-                    </div>
-                </div>
-            @endif
+                @endforeach
+            </div>
         </div>
-    </div>
+    @else
+        <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm font-medium text-amber-700">
+            No hay promedios por semestre registrados.
+        </div>
+    @endif
+</div>
 
     {{-- Acudiente --}}
     <div class="rounded-xl border border-slate-200 bg-white p-4">

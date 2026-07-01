@@ -1,5 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white/80 backdrop-blur border-b border-slate-200">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<nav x-data="{ open: false }" class="relative z-[9999] bg-white/80 backdrop-blur border-b border-slate-200">    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
 
             {{-- LEFT --}}
@@ -57,7 +56,7 @@
             </div>
 
             {{-- RIGHT (desktop) --}}
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <div class="relative z-[99999] hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-slate-600 bg-white/50 hover:text-slate-900 focus:outline-none transition">

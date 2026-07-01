@@ -224,7 +224,7 @@
                 <div class="student-hero-content">
                     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                         <div>
-<div class="student-badge"> 
+                        <div class="student-badge"> 
                                     <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
                                 Seguimiento en tiempo real
                             </div>
@@ -264,31 +264,31 @@
 
                 <div class="reveal student-kpi-card">
                 <div class="student-kpi-label">Postuladas</div>
-                <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['postulado'] ?? 0 }}</div>
+                <div class="student-kpi-value">{{ $counts['postulado'] ?? 0 }}</div>
                 </div>
 
                 <div class="reveal student-kpi-card">
                     <div class="student-kpi-label">En estudio</div>
-                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['en_estudio'] ?? 0 }}</div>
+                    <div class="student-kpi-value">{{ $counts['en_estudio'] ?? 0 }}</div>
                 </div>
 
                 <div class="reveal student-kpi-card">
                     <div class="student-kpi-label">Aprobadas</div>
-                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['aprobado'] ?? 0 }}</div>
+                    <div class="student-kpi-value">{{ $counts['aprobado'] ?? 0 }}</div>
                 </div>
 
                 <div class="reveal student-kpi-card">
                     <div class="student-kpi-label">Rechazadas</div>
-                    <div class="mt-2 text-3xl font-extrabold text-slate-900">{{ $counts['rechazado'] ?? 0 }}</div>
+                    <div class="student-kpi-value">{{ $counts['rechazado'] ?? 0 }}</div>
                 </div>
             </div>
 
             {{-- Recientes --}}
-            <div class="reveal rounded-2xl border border-slate-200 bg-white shadow-sm">
+            <div class="reveal student-card">
                 <div class="p-6 flex items-center justify-between gap-4">
                     <div>
-                        <h3 class="text-lg font-semibold text-slate-900">Mis postulaciones recientes</h3>
-                        <p class="mt-1 text-sm text-slate-500">Accede rápido al detalle, documentos e historial.</p>
+                        <h3 class="student-section-title">Mis postulaciones recientes</h3>
+                        <p class="student-section-description">Accede rápido al detalle, documentos e historial.</p>
                     </div>
 
                     <a href="{{ route('student.postulaciones.index') }}"
@@ -308,7 +308,7 @@
                     </div>
                 @else
                     <div class="px-6 pb-6 overflow-x-auto">
-                        <table class="min-w-full divide-y divide-slate-200">
+                        <table class="student-table min-w-full divide-y divide-slate-200">
                             <thead class="bg-slate-50">
                                 <tr>
                                     <th class="px-4 py-3 text-left text-xs font-semibold text-slate-500 uppercase">#</th>
@@ -326,6 +326,7 @@
                                             'primer_semestre' => 'Primer semestre',
                                             'otro_semestre' => 'Otro semestre',
                                             'renovacion' => 'Renovación',
+                                            'becado_actual' => 'Becado actual',
                                             default => 'N/D',
                                         };
 
@@ -377,22 +378,22 @@
 
             {{-- Cómo funciona (mini) --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div class="reveal rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <div class="text-xs font-semibold text-blue-800">Paso 1</div>
-                    <div class="mt-2 font-semibold text-slate-900">Crea tu postulación</div>
-                    <div class="mt-1 text-sm text-slate-600">Completa la información solicitada y adjunta los documentos requeridos.</div>
+                <div class="reveal student-step-card">
+                    <div class="student-step-number text-blue-800">Paso 1</div>
+                    <div class="student-step-title">Crea tu postulación</div>
+                    <div class="student-step-text">Completa la información solicitada y adjunta los documentos requeridos.</div>
                 </div>
 
-                <div class="reveal rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <div class="text-xs font-semibold text-emerald-700">Paso 2</div>
-                    <div class="mt-2 font-semibold text-slate-900">En estudio</div>
-                    <div class="mt-1 text-sm text-slate-600">La Fundación revisa tu documentación y gestiona el proceso de evaluación.</div>
+                <div class="reveal student-step-card">
+                    <div class="student-step-number text-blue-800">Paso 2</div>
+                    <div class="student-step-title">En estudio</div>
+                   <div class="student-step-text">La Fundación revisa tu documentación y gestiona el proceso de evaluación.</div>
                 </div>
 
-                <div class="reveal rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                    <div class="text-xs font-semibold text-slate-700">Paso 3</div>
-                    <div class="mt-2 font-semibold text-slate-900">Resultado y seguimiento</div>
-                    <div class="mt-1 text-sm text-slate-600">Consulta el avance, el resultado de la solicitud y las novedades desde el detalle.</div>
+                <div class="reveal student-step-card">
+                   <div class="student-step-number text-blue-800">Paso 3</div>
+                    <div class="student-step-title">Resultado y seguimiento</div>
+                    <div class="student-step-text">Consulta el avance, el resultado de la solicitud y las novedades desde el detalle.</div>
                 </div>
             </div>
 

@@ -1,199 +1,262 @@
 <x-app-layout>
     <x-slot name="header">
         <style>
-    .student-postulation-page {
-        font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: #0f172a;
-    }
+            .student-top-hero {
+                position: relative;
+                overflow: hidden;
+                border-radius: 28px;
+                border: 1px solid #e2e8f0;
+                background: #ffffff;
+                box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            }
 
-    .student-postulation-card {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 24px;
-        box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
-        overflow: hidden;
-    }
+            .student-top-hero-content {
+                position: relative;
+                padding: 2rem;
+            }
 
-    .student-postulation-inner {
-        padding: 2rem;
-    }
+            .student-top-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: .5rem;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, .85);
+                padding: .45rem .85rem;
+                font-size: .9rem;
+                font-weight: 800;
+                color: #334155;
+                border: 1px solid #e2e8f0;
+                box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            }
 
-    .student-section {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        border-radius: 22px;
-        padding: 1.5rem;
-        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-    }
+            .student-top-title {
+                margin-top: 1rem;
+                font-size: 2rem;
+                line-height: 2.4rem;
+                font-weight: 900;
+                letter-spacing: -0.035em;
+            }
 
-    .student-section-title {
-        font-size: 1.05rem;
-        font-weight: 800;
-        letter-spacing: .04em;
-        text-transform: uppercase;
-        color: #1e3a8a;
-        margin-bottom: 1rem;
-        padding-bottom: .85rem;
-        border-bottom: 1px solid #e2e8f0;
-    }
+            .student-top-description {
+                margin-top: .75rem;
+                max-width: 46rem;
+                font-size: 1.05rem;
+                line-height: 1.75rem;
+                color: #64748b;
+            }
 
-    .student-postulation-page label {
-        display: block;
-        margin-bottom: .45rem;
-        font-size: 1rem;
-        font-weight: 700;
-        color: #334155;
-    }
+            .student-top-note {
+                margin-top: .75rem;
+                font-size: .95rem;
+                font-weight: 600;
+                color: #64748b;
+            }
 
-    .student-postulation-page input[type="text"],
-    .student-postulation-page input[type="email"],
-    .student-postulation-page input[type="number"],
-    .student-postulation-page input[type="date"],
-    .student-postulation-page select,
-    .student-postulation-page textarea {
-        width: 100%;
-        border-radius: 14px !important;
-        border: 1px solid #cbd5e1 !important;
-        background-color: #ffffff !important;
-        padding: .85rem 1rem !important;
-        font-size: 1rem !important;
-        line-height: 1.5rem !important;
-        color: #0f172a !important;
-        box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
-        outline: none !important;
-    }
+            .student-top-btn-secondary {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 14px;
+                border: 1px solid #cbd5e1;
+                background: #ffffff;
+                padding: .85rem 1.25rem;
+                font-size: 1rem;
+                font-weight: 800;
+                color: #334155;
+                transition: all .15s ease;
+                text-decoration: none;
+                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
+            }
 
-    .student-postulation-page input:focus,
-    .student-postulation-page select:focus,
-    .student-postulation-page textarea:focus {
-        border-color: #2563eb !important;
-        box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13) !important;
-    }
+            .student-top-btn-secondary:hover {
+                background: #f8fafc;
+            }
+        </style>
 
-    .student-postulation-page input[type="file"] {
-        width: 100%;
-        border-radius: 14px;
-        border: 1px dashed #cbd5e1;
-        background: #f8fafc;
-        padding: .9rem;
-        font-size: .95rem;
-        color: #334155;
-    }
+        <div class="student-top-hero">
+            <div class="absolute inset-0">
+                <div class="h-full w-full bg-gradient-to-br from-white via-slate-50 to-slate-100"></div>
+                <div class="absolute -top-20 -right-16 h-64 w-64 rounded-full bg-emerald-200/35 blur-3xl"></div>
+                <div class="absolute -bottom-20 -left-16 h-64 w-64 rounded-full bg-blue-200/35 blur-3xl"></div>
+                <div class="absolute left-0 right-0 top-0 h-1 bg-gradient-to-r from-blue-800 via-slate-900 to-emerald-500"></div>
+            </div>
 
-    .student-postulation-page p,
-    .student-postulation-page .help-text {
-        font-size: .95rem;
-        line-height: 1.55rem;
-        color: #64748b;
-    }
+            <div class="student-top-hero-content">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <div class="student-top-badge">
+                            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                            Nueva solicitud
+                        </div>
 
-    .student-readonly-box {
-        background: linear-gradient(135deg, #eff6ff, #f8fafc);
-        border: 1px solid #dbeafe;
-        border-radius: 22px;
-        padding: 1.5rem;
-    }
+                        <h1 class="student-top-title">
+                            <span class="bg-gradient-to-r from-blue-900 via-slate-900 to-emerald-700 bg-clip-text text-transparent">
+                                Crear postulación
+                            </span>
+                        </h1>
 
-    .student-actions-bar {
-        position: sticky;
-        bottom: 0;
-        z-index: 20;
-        margin-top: 2rem;
-        border: 1px solid #e2e8f0;
-        border-radius: 22px;
-        background: rgba(255, 255, 255, .94);
-        backdrop-filter: blur(10px);
-        padding: 1rem;
-        box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
-    }
+                        <p class="student-top-description">
+                            Completa cuidadosamente la información requerida para enviar tu solicitud a revisión de coordinación y gerencia.
+                        </p>
 
-    .student-btn-primary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 14px;
-        background: #1d4ed8;
-        padding: .85rem 1.4rem;
-        font-size: 1rem;
-        font-weight: 800;
-        color: #ffffff;
-        transition: all .15s ease;
-    }
+                        <p class="student-top-note">
+                            Asegúrate de adjuntar todos los documentos obligatorios.
+                        </p>
+                    </div>
 
-    .student-btn-primary:hover {
-        background: #1e40af;
-    }
-
-    .student-btn-secondary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 14px;
-        border: 1px solid #cbd5e1;
-        background: #ffffff;
-        padding: .85rem 1.4rem;
-        font-size: 1rem;
-        font-weight: 800;
-        color: #334155;
-        transition: all .15s ease;
-    }
-
-    .student-btn-secondary:hover {
-        background: #f8fafc;
-    }
-</style>
-    <div class="rounded-2xl p-8 
-                bg-gradient-to-r from-slate-100 via-slate-200 to-blue-100 
-                border border-slate-200 shadow-sm">
-
-        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
-
-            {{-- Lado izquierdo --}}
-            <div>
-
-                {{-- Badge --}}
-                <div class="inline-flex items-center gap-2 
-                            px-4 py-1.5 rounded-full 
-                            bg-white/70 backdrop-blur 
-                            border border-slate-300 
-                            text-xs font-medium text-slate-700 shadow-sm">
-                    ✍️ Nueva solicitud
+                    <div class="flex gap-3">
+                        <a href="{{ route('student.postulaciones.index') }}"
+                           class="student-top-btn-secondary">
+                            ← Volver a mis postulaciones
+                        </a>
+                    </div>
                 </div>
-
-                {{-- Título --}}
-                <h1 class="mt-4 text-3xl lg:text-4xl font-bold text-slate-900">
-                    Crear postulación
-                </h1>
-
-                {{-- Descripción --}}
-                <p class="mt-3 text-slate-700 max-w-2xl leading-relaxed">
-                    Completa cuidadosamente la información requerida para enviar tu solicitud
-                    a revisión de coordinación y gerencia.
-                </p>
-
-                <p class="mt-3 text-sm text-slate-500">
-                    Asegúrate de adjuntar todos los documentos obligatorios.
-                </p>
             </div>
-
-            {{-- Botón derecha --}}
-            <div class="flex items-center gap-4">
-
-                <a href="{{ route('student.postulaciones.index') }}"
-                   class="inline-flex items-center gap-2 
-                          bg-white border border-slate-300 
-                          text-slate-700 px-6 py-3 
-                          rounded-xl font-medium 
-                          hover:bg-slate-50 transition">
-                    ← Volver a mis postulaciones
-                </a>
-
-            </div>
-
         </div>
-    </div>
-</x-slot>
+    </x-slot>
+        <style>
+        .student-postulation-page {
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            color: #0f172a;
+        }
 
+        .student-postulation-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 24px;
+            box-shadow: 0 14px 35px rgba(15, 23, 42, 0.06);
+            overflow: hidden;
+        }
+
+        .student-postulation-inner {
+            padding: 2rem;
+        }
+
+        .student-section {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+        }
+
+        .student-section-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+            padding-bottom: .85rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .student-postulation-page label {
+            display: block;
+            margin-bottom: .45rem;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #334155;
+        }
+
+        .student-postulation-page input[type="text"],
+        .student-postulation-page input[type="email"],
+        .student-postulation-page input[type="number"],
+        .student-postulation-page input[type="date"],
+        .student-postulation-page select,
+        .student-postulation-page textarea {
+            width: 100%;
+            border-radius: 14px !important;
+            border: 1px solid #cbd5e1 !important;
+            background-color: #ffffff !important;
+            padding: .85rem 1rem !important;
+            font-size: 1rem !important;
+            line-height: 1.5rem !important;
+            color: #0f172a !important;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05) !important;
+            outline: none !important;
+        }
+
+        .student-postulation-page input:focus,
+        .student-postulation-page select:focus,
+        .student-postulation-page textarea:focus {
+            border-color: #2563eb !important;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.13) !important;
+        }
+
+        .student-postulation-page input[type="file"] {
+            width: 100%;
+            border-radius: 14px;
+            border: 1px dashed #cbd5e1;
+            background: #f8fafc;
+            padding: .9rem;
+            font-size: .95rem;
+            color: #334155;
+        }
+
+        .student-postulation-page p,
+        .student-postulation-page .help-text {
+            font-size: .95rem;
+            line-height: 1.55rem;
+            color: #64748b;
+        }
+
+        .student-readonly-box {
+            background: linear-gradient(135deg, #eff6ff, #f8fafc);
+            border: 1px solid #dbeafe;
+            border-radius: 22px;
+            padding: 1.5rem;
+        }
+
+        .student-actions-bar {
+            position: sticky;
+            bottom: 0;
+            z-index: 20;
+            margin-top: 2rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 22px;
+            background: rgba(255, 255, 255, .94);
+            backdrop-filter: blur(10px);
+            padding: 1rem;
+            box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.08);
+        }
+
+        .student-btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            background: #1d4ed8;
+            padding: .85rem 1.4rem;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #ffffff;
+            transition: all .15s ease;
+        }
+
+        .student-btn-primary:hover {
+            background: #1e40af;
+        }
+
+        .student-btn-secondary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 14px;
+            border: 1px solid #cbd5e1;
+            background: #ffffff;
+            padding: .85rem 1.4rem;
+            font-size: 1rem;
+            font-weight: 800;
+            color: #334155;
+            transition: all .15s ease;
+        }
+
+        .student-btn-secondary:hover {
+            background: #f8fafc;
+        }
+    </style>
 
     <div class="student-postulation-page max-w-6xl mx-auto py-10 px-6">
 

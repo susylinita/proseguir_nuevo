@@ -2,10 +2,8 @@
 
 namespace App\Filament\Widgets;
 
-use App\Models\User;
 use App\Models\Postulacion;
-// cambia este modelo por el tuyo real si el nombre no coincide
-use App\Models\KitEscolar;
+use App\Models\User;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
 
@@ -15,27 +13,44 @@ class DashboardIndicadoresWidget extends BaseWidget
 
     protected function getStats(): array
     {
-        $totalPostulaciones = Postulacion::count();
-        $postulados = Postulacion::where('estado', 'Postulado')->count();
-        $enEstudio = Postulacion::where('estado', 'En estudio')->count();
-        $pendGerencia = Postulacion::where('estado', 'Pendiente aprobación gerencia')->count();
+        $totalPostulaciones = Postulacion::query()->count();
+
+        $postulados = Postulacion::query()
+            ->whereIn('estado', ['Postulado', 'Pendiente'])
+            ->count();
+
+        $enEstudio = Postulacion::query()
+            ->where('estado', 'En estudio')
+            ->count();
+
+        $pendGerencia = Postulacion::query()
+            ->where('estado', 'Pendiente aprobación gerencia')
+            ->count();
+
+        $aprobadas = Postulacion::query()
+            ->where('estado', 'Aprobado')
+            ->count();
+
+        $kitsTotal = class_exists(\App\Models\KitEscolar::class)
+            ? \App\Models\KitEscolar::query()->count()
+            : 0;
 
         return [
             Stat::make('Becas (Total)', $totalPostulaciones)
-                ->description("Postulado: {$postulados} · En estudio: {$enEstudio} · Pend. gerencia: {$pendGerencia}")
+                ->description("Postulado: {$postulados} · En estudio: {$enEstudio} · Pend. gerencia: {$pendGerencia} · Aprobadas: {$aprobadas}")
                 ->icon('heroicon-o-academic-cap')
                 ->extraAttributes([
                     'class' => 'fp-stat-card fp-stat-card--blue',
                 ]),
 
-            Stat::make('Kits', class_exists(KitEscolar::class) ? KitEscolar::count() : 0)
+            Stat::make('Kits', $kitsTotal)
                 ->description('Total registrados')
                 ->icon('heroicon-o-gift')
                 ->extraAttributes([
                     'class' => 'fp-stat-card fp-stat-card--orange',
                 ]),
 
-            Stat::make('Usuarios', User::count())
+            Stat::make('Usuarios', User::query()->count())
                 ->description('Total en el sistema')
                 ->icon('heroicon-o-users')
                 ->extraAttributes([

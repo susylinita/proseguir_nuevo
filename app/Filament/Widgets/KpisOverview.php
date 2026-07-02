@@ -13,29 +13,45 @@ class KpisOverview extends BaseWidget
 
     protected function getStats(): array
     {
-        $becasTotal      = Postulacion::query()->count();
-        $becasPendiente  = Postulacion::query()->where('estado', 'Pendiente')->count();
-        $becasEntrevista = Postulacion::query()->where('estado', 'Entrevista')->count();
+        $becasTotal = Postulacion::query()->count();
+
+        $postulados = Postulacion::query()
+            ->whereIn('estado', ['Postulado', 'Pendiente'])
+            ->count();
+
+        $enEstudio = Postulacion::query()
+            ->where('estado', 'En estudio')
+            ->count();
+
+        $pendGerencia = Postulacion::query()
+            ->where('estado', 'Pendiente aprobación gerencia')
+            ->count();
+
+        $aprobadas = Postulacion::query()
+            ->where('estado', 'Aprobado')
+            ->count();
 
         $usuariosTotal = User::query()->count();
 
-        // ✅ Kits (si tienes modelo Kit). Si NO existe, queda en 0.
-        $kitsTotal = class_exists(\App\Models\Kit::class)
-            ? \App\Models\Kit::query()->count()
+        $kitsTotal = class_exists(\App\Models\KitEscolar::class)
+            ? \App\Models\KitEscolar::query()->count()
             : 0;
 
         return [
             Stat::make('Becas (Total)', $becasTotal)
-                ->description("Pendiente: {$becasPendiente} · Entrevista: {$becasEntrevista}")
-                ->color('primary'),
+                ->description("Postulado: {$postulados} · En estudio: {$enEstudio} · Pend. gerencia: {$pendGerencia} · Aprobadas: {$aprobadas}")
+                ->color('primary')
+                ->icon('heroicon-o-academic-cap'),
 
             Stat::make('Kits', $kitsTotal)
                 ->description('Total registrados')
-                ->color('warning'),
+                ->color('warning')
+                ->icon('heroicon-o-gift'),
 
             Stat::make('Usuarios', $usuariosTotal)
                 ->description('Total en el sistema')
-                ->color('success'),
+                ->color('success')
+                ->icon('heroicon-o-users'),
         ];
     }
 }

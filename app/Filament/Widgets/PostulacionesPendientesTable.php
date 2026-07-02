@@ -9,14 +9,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class PostulacionesPendientesTable extends BaseWidget
 {
-    protected static ?string $heading = 'Postulaciones recientes (Postulado / En estudio)';
+    protected static ?string $heading = 'Postulaciones recientes';
     protected static ?int $sort = 3;
     protected int|string|array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {
         return Postulacion::query()
-            ->whereIn('estado', ['Postulado', 'En estudio'])
             ->latest();
     }
 
@@ -44,12 +43,23 @@ class PostulacionesPendientesTable extends BaseWidget
                 ->limit(20)
                 ->wrap(false),
 
+            Tables\Columns\TextColumn::make('created_at')
+                ->label('Fecha registro')
+                ->dateTime('d/m/Y H:i')
+                ->timezone('America/Bogota')
+                ->sortable(),
+
             Tables\Columns\TextColumn::make('estado')
                 ->label('Estado')
                 ->badge()
+                ->formatStateUsing(fn (string $state): string => match ($state) {
+                    'Pendiente aprobación gerencia' => 'Pend. gerencia',
+                    default => $state,
+                })
                 ->color(fn (string $state): string => match ($state) {
-                    'Postulado' => 'warning',
+                    'Postulado', 'Pendiente' => 'warning',
                     'En estudio' => 'info',
+                    'Pendiente aprobación gerencia' => 'primary',
                     'Aprobado' => 'success',
                     'Rechazado' => 'danger',
                     'Cancelado' => 'gray',
@@ -70,7 +80,8 @@ class PostulacionesPendientesTable extends BaseWidget
 
             Tables\Columns\TextColumn::make('estado_actualizado_en')
                 ->label('Fecha cambio')
-                ->dateTime('Y-m-d H:i')
+                ->dateTime('d/m/Y H:i')
+                ->timezone('America/Bogota')
                 ->sortable()
                 ->placeholder('—'),
         ];

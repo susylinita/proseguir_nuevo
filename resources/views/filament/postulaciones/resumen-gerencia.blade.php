@@ -114,6 +114,24 @@
             ">
                 {{ $postulacion->estado ?? 'Sin estado' }}
             </div>
+            <div>
+    <div class="text-sm font-semibold text-slate-500">
+        Fecha y hora de registro
+    </div>
+
+    <div class="mt-1 text-base font-bold text-slate-900">
+        {{ optional($postulacion->created_at)->timezone('America/Bogota')->format('d/m/Y H:i') ?? 'N/D' }}
+    </div>
+</div>
+<div>
+    <div class="text-sm font-semibold text-slate-500">
+        Última actualización
+    </div>
+
+    <div class="mt-1 text-base font-bold text-slate-900">
+        {{ optional($postulacion->updated_at)->timezone('America/Bogota')->format('d/m/Y H:i') ?? 'N/D' }}
+    </div>
+</div>
         </div>
     </div>
 </div>
@@ -213,29 +231,7 @@
     </div>
 
     {{-- Puntajes --}}
-    <div class="rounded-xl border border-slate-200 bg-white p-4">
-        <h3 class="text-base font-semibold text-slate-900">
-            Evaluación académica
-        </h3>
-
-        <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-            <div>
-                <div class="text-slate-500">Puntaje Saber 11</div>
-                <div class="font-medium {{ ($postulacion->puntaje_saber ?? 0) >= 300 ? 'text-green-700' : 'text-red-700' }}">
-                    {{ $postulacion->puntaje_saber ?? 'N/D' }}
-                </div>
-            </div>
-
-            <div>
-                <div class="text-slate-500">Promedio acumulado</div>
-                <div class="font-medium {{ ($postulacion->promedio_universitario ?? 0) >= 3.8 ? 'text-green-700' : 'text-red-700' }}">
-                    {{ $postulacion->promedio_universitario ?? 'N/D' }}
-                </div>
-            </div>
-
-
-        </div>
-    </div>
+   
 
     {{-- INFORMACIÓN ACADÉMICA --}}
 <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">

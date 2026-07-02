@@ -966,7 +966,7 @@ public static function canDelete($record): bool
             ->modifyQueryUsing(function ($query) {
                 return $query
                     ->orderByDesc('entrevista_recomendado')
-                    ->orderBy('promedio_universitario', 'asc')
+                    ->orderByRaw('COALESCE(promedio_universitario, promedio_carrera) ASC')
                     ->latest();
 })
 
@@ -1094,15 +1094,43 @@ public static function canDelete($record): bool
     ->limit(45)
     ->tooltip(fn ($record) => $record->estudiante_nombre),
 
+    Tables\Columns\TextColumn::make('created_at')
+    ->label('Fecha registro')
+    ->dateTime('d/m/Y H:i')
+    ->timezone('America/Bogota')
+    ->sortable()
+    ->toggleable(),
+
     Tables\Columns\TextColumn::make('estudiante_email')
         ->label('Email')
         ->searchable()
         ->toggleable(isToggledHiddenByDefault: true),
 
-    Tables\Columns\TextColumn::make('promedio_universitario')
+    Tables\Columns\TextColumn::make('promedio_mostrado')
     ->label('Promedio')
+    ->state(function ($record) {
+        return $record->promedio_universitario
+            ?? $record->promedio_carrera
+            ?? null;
+    })
+    ->formatStateUsing(function ($state) {
+        return filled($state)
+            ? number_format((float) $state, 2)
+            : 'N/D';
+    })
     ->badge()
-    ->sortable()
+    ->color(function ($state) {
+        if (blank($state)) {
+            return 'gray';
+        }
+
+        return (float) $state >= 3.8 ? 'success' : 'danger';
+    })
+    ->sortable(query: function (Builder $query, string $direction) {
+        return $query->orderByRaw(
+            'COALESCE(promedio_universitario, promedio_carrera) ' . $direction
+        );
+    })
     ->alignCenter()
     ->visible(fn () => auth()->user()?->hasRole('admin') ?? false),
 
@@ -1165,11 +1193,11 @@ Tables\Columns\TextColumn::make('observaciones')
 
 ->filters([
     Tables\Filters\Filter::make('cumple_requisitos')
-        ->label('Candidatos aptos')
-        ->query(fn (Builder $query) => $query
-            ->where('promedio_universitario', '>=', 3.8)
-            ->where('puntaje_saber', '>=', 300)
-        ),
+    ->label('Candidatos aptos')
+    ->query(fn (Builder $query) => $query
+        ->whereRaw('COALESCE(promedio_universitario, promedio_carrera) >= ?', [3.8])
+        ->where('puntaje_saber', '>=', 300)
+    ),
 
     Tables\Filters\Filter::make('recomendados')
         ->label('Recomendados')

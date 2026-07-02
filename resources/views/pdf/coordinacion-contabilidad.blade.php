@@ -51,7 +51,7 @@
         <tr>
             <td>{{ $p->id }}</td>
             <td>{{ $p->estudiante_nombre }}</td>
-            <td>{{ $postulacion->tipo_documento }}</td>
+            <td>{{ $p->tipo_documento ?: 'N/D' }}</td>
             <td>{{ $p->documento_identidad ?: 'N/D' }}</td>
             <td>{{ $p->banco ?: 'N/D' }}</td>
             <td>{{ $p->tipo_cuenta ?: 'N/D' }}</td>

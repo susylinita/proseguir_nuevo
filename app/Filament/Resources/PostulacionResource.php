@@ -964,10 +964,8 @@ public static function canDelete($record): bool
     {
         return $table
             ->modifyQueryUsing(function ($query) {
-                return $query
-                    ->orderByDesc('entrevista_recomendado')
-                    ->orderByRaw('COALESCE(promedio_universitario, promedio_carrera) ASC')
-                    ->latest();
+    return $query
+        ->orderByDesc('created_at');
 })
 
             ->recordClasses(function ($record) {

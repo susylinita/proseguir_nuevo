@@ -10,13 +10,15 @@ use Illuminate\Database\Eloquent\Builder;
 class PostulacionesPendientesTable extends BaseWidget
 {
     protected static ?string $heading = 'Postulaciones recientes';
+
     protected static ?int $sort = 3;
+
     protected int|string|array $columnSpan = 'full';
 
     protected function getTableQuery(): Builder
     {
         return Postulacion::query()
-            ->latest();
+            ->orderByDesc('created_at');
     }
 
     protected function getTableColumns(): array
@@ -90,13 +92,19 @@ class PostulacionesPendientesTable extends BaseWidget
     protected function getTableActions(): array
     {
         return [
-            Tables\Actions\Action::make('ver')
+            Tables\Actions\Action::make('ver_resumen_gerencia')
                 ->label('Ver')
                 ->icon('heroicon-o-eye')
                 ->iconButton()
-                ->tooltip('Ver postulación')
-                ->url(fn (Postulacion $record) => route('filament.admin.resources.postulacions.view', $record))
-                ->openUrlInNewTab(),
+                ->tooltip('Ver resumen de la postulación')
+                ->color('gray')
+                ->modalHeading(fn (Postulacion $record) => 'Resumen de postulación - ' . $record->estudiante_nombre)
+                ->modalWidth('7xl')
+                ->modalSubmitAction(false)
+                ->modalCancelActionLabel('Cerrar')
+                ->modalContent(fn (Postulacion $record) => view('filament.postulaciones.resumen-gerencia', [
+                    'postulacion' => $record,
+                ])),
         ];
     }
 }

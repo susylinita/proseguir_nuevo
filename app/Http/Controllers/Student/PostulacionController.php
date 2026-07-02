@@ -29,6 +29,7 @@ class PostulacionController extends Controller
     public function store(Request $request)
 {
     $user = auth()->user();
+    $data['titular_cuenta'] = auth()->user()->name;
 
 if ($user->becas_bloqueado) {
     return back()->withErrors([
@@ -57,7 +58,7 @@ if ($user->becas_bloqueado) {
         // Bancarios (se vuelven obligatorios o no, según el tipo)
         'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
         'titular_cuenta' => ['nullable', 'string', 'max:120'],
-        'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente'],
+        'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente,Nequi,Daviplata'],
         'numero_cuenta' => ['nullable', 'string', 'max:50'],
         'cuenta_actualizada' => ['nullable'],
 
@@ -88,7 +89,7 @@ if ($user->becas_bloqueado) {
             // Bancarios requeridos en primera vez
             'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
             'titular_cuenta' => ['required', 'string', 'max:120'],
-            'tipo_cuenta' => ['required', 'in:Ahorros,Corriente'],
+            'tipo_cuenta' => ['required', 'in:Ahorros,Corriente,Nequi,Daviplata'],
             'numero_cuenta' => ['required', 'string', 'max:50'],
         ];
     } elseif ($tipo === 'otro_semestre') {
@@ -105,7 +106,7 @@ if ($user->becas_bloqueado) {
             // Bancarios requeridos en primera vez
             'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
             'titular_cuenta' => ['required', 'string', 'max:120'],
-            'tipo_cuenta' => ['required', 'in:Ahorros,Corriente'],
+            'tipo_cuenta' => ['required', 'in:Ahorros,Corriente,Nequi,Daviplata'],
             'numero_cuenta' => ['required', 'string', 'max:50'],
         ];
     } else { // renovacion
@@ -133,7 +134,7 @@ if ($user->becas_bloqueado) {
 
         'banco' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'string', 'max:80'],
         'titular_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'string', 'max:120'],
-        'tipo_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'in:Ahorros,Corriente'],
+        'tipo_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'in:Ahorros,Corriente,Nequi,Daviplata'],
         'numero_cuenta' => [$request->boolean('cuenta_actualizada') ? 'required' : 'nullable', 'string', 'max:50'],
     ];
 }
@@ -221,6 +222,8 @@ if ($user->becas_bloqueado) {
     public function update(Request $request, Postulacion $postulacion)
 {
     $this->authorize('update', $postulacion);
+    $data['titular_cuenta'] = auth()->user()->name;
+    
 
     $tipo = $postulacion->tipo_postulacion; // NO permitimos cambiar tipo desde update
 
@@ -250,7 +253,7 @@ if ($user->becas_bloqueado) {
         // banco (siempre opcional; en renovación solo se usa si cuenta_actualizada)
         'banco' => ['required', Rule::in(array_keys(BankOptions::options()))],
         'titular_cuenta' => ['nullable', 'string', 'max:120'],
-        'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente'],
+        'tipo_cuenta' => ['nullable', 'in:Ahorros,Corriente,Nequi,Daviplata'],
         'numero_cuenta' => ['nullable', 'string', 'max:50'],
         'cuenta_actualizada' => ['nullable', 'boolean'],
 

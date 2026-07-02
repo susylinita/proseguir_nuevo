@@ -548,9 +548,17 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700">Titular de la cuenta</label>
-                                    <input name="titular_cuenta" type="text"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                           value="{{ old('titular_cuenta') }}">
+                                    <input
+                                        name="titular_cuenta"
+                                        type="text"
+                                        class="mt-1 block w-full rounded-md border-gray-300 bg-slate-100 text-slate-700 shadow-sm cursor-not-allowed"
+                                        value="{{ auth()->user()->name }}"
+                                        readonly
+                                    >
+
+                                    <p class="mt-1 text-xs text-slate-500">
+                                        El titular de la cuenta se toma automáticamente del nombre del postulante.
+                                    </p>
                                 </div>
 
                                 <div>

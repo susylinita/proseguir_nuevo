@@ -225,6 +225,76 @@
             box-shadow: 0 8px 20px rgba(15, 23, 42, .14);
         }
 
+        .home-video-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 32px;
+            border: 1px solid #e2e8f0;
+            background: #ffffff;
+            box-shadow: 0 24px 70px rgba(15, 23, 42, .10);
+        }
+
+        .home-video-card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at top right, rgba(16, 185, 129, .18), transparent 22rem),
+                radial-gradient(circle at bottom left, rgba(37, 99, 235, .14), transparent 24rem),
+                linear-gradient(135deg, #ffffff 0%, #f8fafc 48%, #eff6ff 100%);
+        }
+
+        .home-video-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #1e40af, #0f172a, #10b981);
+        }
+
+        .home-video-content {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .home-video-title {
+            margin-top: 1rem;
+            font-size: clamp(1.8rem, 3vw, 2.7rem);
+            line-height: 1.05;
+            font-weight: 900;
+            letter-spacing: -0.045em;
+            color: #0f172a;
+        }
+
+        .home-video-description {
+            margin-top: 1rem;
+            max-width: 44rem;
+            font-size: 1.05rem;
+            line-height: 1.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .home-video-wrapper {
+            overflow: hidden;
+            border-radius: 24px;
+            border: 1px solid #e2e8f0;
+            background: #0f172a;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, .16);
+        }
+
+        .home-video {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 520px;
+            background: #0f172a;
+        }
+
         .home-step-card,
         .home-portal-card {
             background: #ffffff;
@@ -277,6 +347,14 @@
             100% { transform: translateY(0) scale(1); }
         }
 
+        @media (min-width: 1024px) {
+            .home-video-content {
+                grid-template-columns: 0.8fr 1.2fr;
+                align-items: center;
+                padding: 3rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .home-hero-content {
                 padding: 1.6rem;
@@ -284,6 +362,10 @@
 
             .home-topbar .brand-text {
                 display: none;
+            }
+
+            .home-video-content {
+                padding: 1.6rem;
             }
         }
     </style>
@@ -447,6 +529,8 @@
         </div>
     </section>
 
+    
+
     {{-- PORTALES --}}
     <section id="portales" class="mx-auto max-w-7xl px-4 pb-14 sm:px-6 lg:px-8">
         <div class="scroll-mt-24"></div>
@@ -531,6 +615,51 @@
         </div>
     </section>
 
+    {{-- VIDEO EXPLICATIVO --}}
+    <section class="mx-auto max-w-7xl px-4 pb-10 sm:px-6 lg:px-8">
+        <div class="reveal home-video-card">
+            <div class="home-video-line"></div>
+
+            <div class="home-video-content">
+                <div>
+                    <span class="home-badge">
+                        <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+                        Guía rápida
+                    </span>
+
+                    <h2 class="home-video-title">
+                        Aprende cómo registrarte en el portal
+                    </h2>
+
+                    <p class="home-video-description">
+                        Mira este video explicativo para conocer el proceso de registro, selección del portal, ingreso de información y carga de documentos.
+                    </p>
+
+                    <!-- <div class="mt-7 flex flex-wrap gap-3">
+                        <a href="{{ route('register') }}" class="home-btn-primary">
+                            Crear cuenta
+                        </a>
+
+                        <button id="btnVerPortales" type="button" class="home-btn-secondary">
+                            Ver opciones de portal
+                        </button>
+                    </div> -->
+                </div>
+
+                <div class="home-video-wrapper">
+                    <video
+                        controls
+                        preload="metadata"
+                        class="home-video"
+                    >
+                        <source src="{{ asset('videos/video_registro_becas.mp4') }}" type="video/mp4">
+                        Tu navegador no soporta la reproducción de video.
+                    </video>
+                </div>
+            </div>
+        </div>
+    </section>
+    
     {{-- FOOTER --}}
     <footer class="border-t border-slate-200 bg-white">
         <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -575,9 +704,7 @@
 
         els.forEach(el => io.observe(el));
 
-        const btn = document.getElementById('btnElegirPortal');
-
-        btn?.addEventListener('click', () => {
+        const scrollToPortales = () => {
             const target = document.getElementById('portales');
 
             if (!target) return;
@@ -596,7 +723,10 @@
                     c2?.classList.remove('focus-bounce');
                 }, 900);
             }, 650);
-        });
+        };
+
+        document.getElementById('btnElegirPortal')?.addEventListener('click', scrollToPortales);
+        document.getElementById('btnVerPortales')?.addEventListener('click', scrollToPortales);
     })();
 </script>
 

@@ -360,7 +360,6 @@ public static function canDelete($record): bool
     ->preload()
     ->native(false)
     ->placeholder('Seleccione el banco')
-    ->required()
     ->helperText('Seleccione la entidad bancaria o billetera digital registrada por el becario.'),
 
                                 Forms\Components\TextInput::make('titular_cuenta')

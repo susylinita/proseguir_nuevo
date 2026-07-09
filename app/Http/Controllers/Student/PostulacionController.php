@@ -43,7 +43,7 @@ if ($user->becas_bloqueado) {
 
         'fecha_nacimiento' => ['nullable', 'date'],
         'tipo_documento' => ['required', 'string', 'max:20'],
-        'documento_identidad' => ['nullable', 'string', 'max:50'],
+        'documento_identidad' => ['required', 'string', 'max:50'],
         'telefono_fijo' => ['nullable', 'string', 'max:30'],
         'telefono_celular' => ['required', 'string', 'max:30'],
         'direccion' => ['nullable', 'string', 'max:120'],
@@ -188,6 +188,13 @@ if ($user->becas_bloqueado) {
 
     $postulacion = \App\Models\Postulacion::create($data);
 
+    
+    // Actualizar users con los datos diligenciados en la postulación
+    $user->update([
+        'tipo_documento' => $data['tipo_documento'],
+        'cedula' => $data['documento_identidad'],
+    ]);
+
     return redirect()
         ->route('student.postulaciones.show', $postulacion)
         ->with('status', 'Postulación creada correctamente.');
@@ -236,7 +243,7 @@ if ($user->becas_bloqueado) {
         // datos personales
         'fecha_nacimiento' => ['nullable', 'date'],
         'tipo_documento' => ['required', 'string', 'max:20'],
-        'documento_identidad' => ['nullable', 'string', 'max:50'],
+        'documento_identidad' => ['required', 'string', 'max:50'],
         'telefono_fijo' => ['nullable', 'string', 'max:30'],
         'telefono_celular' => ['required', 'string', 'max:30'],
         'direccion' => ['nullable', 'string', 'max:120'],
@@ -380,6 +387,12 @@ if ($user->becas_bloqueado) {
 }
 
     $postulacion->update($data);
+
+    // Actualizar también los datos del usuario relacionado
+    $user->update([
+        'tipo_documento' => $data['tipo_documento'] ?? $user->tipo_documento,
+        'cedula' => $data['documento_identidad'] ?? $user->cedula,
+    ]);
 
     return redirect()
         ->route('student.postulaciones.show', $postulacion)

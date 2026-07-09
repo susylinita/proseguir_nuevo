@@ -309,8 +309,7 @@ public static function canDelete($record): bool
                 Forms\Components\TextInput::make('promedio_universitario')
                     ->label('Promedio acumulado')
                     ->numeric()
-                    ->step(0.1)
-                    ->required(),
+                    ->step(0.1),
             ])
             ->columns(2),
 

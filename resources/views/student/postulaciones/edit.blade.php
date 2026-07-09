@@ -378,10 +378,65 @@
                                 </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Número de documento</label>
-                                    <input name="documento_identidad" type="text"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                           value="{{ old('documento_identidad', $postulacion->documento_identidad) }}">
+                                    <label for="tipo_documento" class="block text-sm font-medium text-gray-700">
+                                        Tipo de documento
+                                    </label>
+
+                                    <select
+                                        id="tipo_documento"
+                                        name="tipo_documento"
+                                        required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                    >
+                                        <option value="">Seleccione una opción</option>
+
+                                        <option value="CC" @selected(old('tipo_documento', $postulacion->tipo_documento) === 'CC')>
+                                            Cédula de ciudadanía
+                                        </option>
+
+                                        <option value="TI" @selected(old('tipo_documento', $postulacion->tipo_documento) === 'TI')>
+                                            Tarjeta de identidad
+                                        </option>
+
+                                        <option value="CE" @selected(old('tipo_documento', $postulacion->tipo_documento) === 'CE')>
+                                            Cédula de extranjería
+                                        </option>
+
+                                        <option value="PAS" @selected(old('tipo_documento', $postulacion->tipo_documento) === 'PAS')>
+                                            Pasaporte
+                                        </option>
+
+                                        <option value="PEP" @selected(old('tipo_documento', $postulacion->tipo_documento) === 'PEP')>
+                                            Permiso especial de permanencia
+                                        </option>
+
+                                        <option value="RC" @selected(old('tipo_documento', $postulacion->tipo_documento) === 'RC')>
+                                            Registro civil
+                                        </option>
+                                    </select>
+
+                                    @error('tipo_documento')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+
+                                <div>
+                                    <label for="documento_identidad" class="block text-sm font-medium text-gray-700">
+                                        Número de documento
+                                    </label>
+
+                                    <input
+                                        id="documento_identidad"
+                                        name="documento_identidad"
+                                        type="text"
+                                        required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                        value="{{ old('documento_identidad', $postulacion->documento_identidad) }}"
+                                    >
+
+                                    @error('documento_identidad')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div>

@@ -352,14 +352,32 @@
                             id="tipo_documento"
                             name="tipo_documento"
                             required
-                            class="mt-1 block w-full rounded-xl border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                        >
+                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
                             <option value="">Seleccione una opción</option>
-                            <option value="CC" {{ old('tipo_documento') == 'CC' ? 'selected' : '' }}>Cédula de ciudadanía</option>
-                            <option value="TI" {{ old('tipo_documento') == 'TI' ? 'selected' : '' }}>Tarjeta de identidad</option>
-                            <option value="CE" {{ old('tipo_documento') == 'CE' ? 'selected' : '' }}>Cédula de extranjería</option>
-                            <option value="PAS" {{ old('tipo_documento') == 'PAS' ? 'selected' : '' }}>Pasaporte</option>
-                            <option value="RC" {{ old('tipo_documento') == 'RC' ? 'selected' : '' }}>Registro civil</option>
+
+                            <option value="CC" @selected(old('tipo_documento') === 'CC')>
+                                Cédula de ciudadanía
+                            </option>
+
+                            <option value="TI" @selected(old('tipo_documento') === 'TI')>
+                                Tarjeta de identidad
+                            </option>
+
+                            <option value="CE" @selected(old('tipo_documento') === 'CE')>
+                                Cédula de extranjería
+                            </option>
+
+                            <option value="PAS" @selected(old('tipo_documento') === 'PAS')>
+                                Pasaporte
+                            </option>
+
+                            <option value="PEP" @selected(old('tipo_documento') === 'PEP')>
+                                Permiso especial de permanencia
+                            </option>
+
+                            <option value="RC" @selected(old('tipo_documento') === 'RC')>
+                                Registro civil
+                            </option>
                         </select>
 
                         @error('tipo_documento')
@@ -368,10 +386,22 @@
                     </div>
 
                                 <div>
-                                    <label class="block text-sm font-medium text-gray-700">Número de documento</label>
-                                    <input name="documento_identidad" type="text"
-                                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                                           value="{{ old('documento_identidad') }}">
+                                    <label for="documento_identidad" class="block text-sm font-medium text-gray-700">
+                                        Número de documento
+                                    </label>
+
+                                    <input
+                                        id="documento_identidad"
+                                        name="documento_identidad"
+                                        type="text"
+                                        required
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                                        value="{{ old('documento_identidad') }}"
+                                    >
+
+                                    @error('documento_identidad')
+                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
                                 </div>
 
                                 <div>
